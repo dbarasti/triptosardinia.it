@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "react-day-picker/style.css";
+
+:root {
+  --background-light: #f6f7f8;
+  --background-dark: #101822;
+  --primary: #136dec;
+}
+
+body {
+  @apply bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-900 dark:text-slate-100 antialiased min-h-screen;
+}
+
+/* Focus visible for accessibility (WCAG 2.1) */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.fill-1 {
+  font-variation-settings: 'FILL' 1;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-rendering: optimizeLegibility;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Interest form date picker – use primary color */
+.rdp-interest-wrapper {
+  --rdp-accent-color: var(--primary);
+  --rdp-accent-background-color: color-mix(in srgb, var(--primary) 18%, transparent);
+  --rdp-day-height: 40px;
+  --rdp-day-width: 40px;
+  --rdp-day_button-height: 38px;
+  --rdp-day_button-width: 38px;
+}
+.rdp-interest-wrapper .rdp-day_button {
+  @apply rounded-full text-slate-700 dark:text-slate-300 transition-colors;
+}
+.rdp-interest-wrapper .rdp-interest-selected .rdp-day_button {
+  @apply bg-primary text-white font-semibold border-2 border-primary;
+}
+.rdp-interest-wrapper .rdp-interest-today .rdp-day_button {
+  @apply border-2 border-primary text-primary font-semibold;
+}
+.rdp-interest-wrapper .rdp-interest-today.rdp-interest-selected .rdp-day_button {
+  @apply bg-primary text-white border-primary;
+}
+.rdp-interest-wrapper .rdp-interest-disabled .rdp-day_button {
+  @apply opacity-40 cursor-not-allowed;
+}
+.rdp-interest-wrapper .rdp-interest-outside {
+  @apply opacity-50;
+}
+.rdp-interest-wrapper .rdp-caption_label {
+  @apply text-sm font-bold text-slate-900 dark:text-white;
+}
+.rdp-interest-wrapper .rdp-nav_button {
+  @apply rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary;
+}
+.rdp-interest-wrapper .rdp-weekday {
+  @apply text-xs font-medium text-slate-500 dark:text-slate-400;
+}

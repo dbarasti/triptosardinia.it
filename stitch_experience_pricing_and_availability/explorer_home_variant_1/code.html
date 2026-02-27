@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Explorer Home - Variant 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#136dec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101822",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden pb-24">
+<!-- Hero Section -->
+<div class="relative h-[440px] w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Stunning high-resolution mountain landscape at sunrise" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJEifS5FOmJ-WDgRnxB3DbiiJ-0t4xuMNo3lfknMVKyCjeRgsZNjvsZvEvQKo1P3G113q6o7d4vX70PeDaKJ4ccvrsED0yyMaRLR3-PlUe0a6set4y17TIA0X0jjIKk3VFIuIvHK9IZJ-hZsYHY8hzf89lA9KcYJJcWxXWqlHEngJhwHtmYNUm_wzTHMlZF49VsrKYNOg5uoq7BFYaGOYH0yN9Ne-6R0WQkMSLj_46QDcG8zHvw65sYsYIaVicxokPAskzEUBjUjo');">
+<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-background-light dark:to-background-dark"></div>
+</div>
+<!-- Header Overlay -->
+<div class="relative z-10 flex items-center justify-between px-6 pt-12">
+<div class="flex items-center gap-2">
+<div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+<span class="material-symbols-outlined text-white">explore</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-white">Explorer</span>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<!-- Hero Content -->
+<div class="relative z-10 mt-16 px-6">
+<h1 class="text-4xl font-extrabold leading-tight text-white drop-shadow-md">
+                    Discover your next <br/><span class="text-primary-200">great adventure</span>
+</h1>
+<!-- Search Bar -->
+<div class="mt-8">
+<div class="flex w-full items-center rounded-xl bg-white p-2 shadow-xl dark:bg-slate-800">
+<div class="flex flex-1 items-center gap-3 px-3">
+<span class="material-symbols-outlined text-primary">search</span>
+<input class="w-full border-none bg-transparent p-0 text-sm font-medium focus:ring-0 text-slate-900 dark:text-white placeholder:text-slate-400" placeholder="Where do you want to go?" type="text"/>
+</div>
+<button class="rounded-lg bg-primary px-5 py-2.5 text-sm font-bold text-white transition-transform active:scale-95">
+                            Search
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Popular Categories -->
+<div class="mt-4 px-6">
+<div class="flex items-center justify-between pb-4">
+<h3 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Popular Categories</h3>
+<a class="text-sm font-semibold text-primary" href="#">See all</a>
+</div>
+<div class="flex justify-between gap-4 overflow-x-auto pb-4 no-scrollbar">
+<div class="flex flex-col items-center gap-2 min-w-[72px]">
+<div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-3xl">landscape</span>
+</div>
+<p class="text-xs font-bold">Hiking</p>
+</div>
+<div class="flex flex-col items-center gap-2 min-w-[72px]">
+<div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-3xl">scuba_diving</span>
+</div>
+<p class="text-xs font-bold">Diving</p>
+</div>
+<div class="flex flex-col items-center gap-2 min-w-[72px]">
+<div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-3xl">surfing</span>
+</div>
+<p class="text-xs font-bold">Surfing</p>
+</div>
+<div class="flex flex-col items-center gap-2 min-w-[72px]">
+<div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-3xl">camping</span>
+</div>
+<p class="text-xs font-bold">Camping</p>
+</div>
+</div>
+</div>
+<!-- Trending Experiences -->
+<div class="mt-8 px-6">
+<div class="flex items-center justify-between pb-4">
+<h3 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Trending Experiences</h3>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-6 no-scrollbar">
+<!-- Card 1 -->
+<div class="min-w-[280px] overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800">
+<div class="relative h-44 w-full bg-cover bg-center" data-alt="Kayaking in crystal clear blue waters" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCDV-Aqrao-6oFoaeGINXzPl91ZGzT4930oHcdkh-5ClotcNY3CytAHhv4mabYWERTID14c8WrTMpJNMt7kxTzMOjY0rKLIpLYruZvJDJokA-dRyDp3eRUd3I8lmDDOuZLoqaeAx_adZcS6GbahUE9dxy5G44EHzgativuR2fcxPg2C2ETqCP4ZbyUg2gVCh_ucVpKREEG9XfPS8L7OTC3xWCUsFvngD_iLxjQIAw0ZuNh0W0hnUFylxJqacdluZQlif5KuiYAP4vE');">
+<div class="absolute top-3 right-3 rounded-full bg-white/80 p-1.5 backdrop-blur-sm">
+<span class="material-symbols-outlined text-slate-900 text-sm font-bold">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-center gap-1 text-xs font-bold text-primary">
+<span class="material-symbols-outlined text-xs">star</span>
+<span>4.9 (124 reviews)</span>
+</div>
+<h4 class="mt-1 text-lg font-bold text-slate-900 dark:text-white">Blue Lagoon Kayaking</h4>
+<p class="mt-1 text-sm text-slate-500">Iceland • 4 hours</p>
+<div class="mt-3 flex items-center justify-between">
+<p class="text-lg font-extrabold text-primary">$89<span class="text-xs font-normal text-slate-500">/person</span></p>
+<span class="material-symbols-outlined text-primary">arrow_forward_ios</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="min-w-[280px] overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800">
+<div class="relative h-44 w-full bg-cover bg-center" data-alt="Tents under a starry night sky" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCSEe9LfrVVF2HjWn2Our8tNwOoe2RFjry1MCPR2AyHXl_T7zQD5nmGUnRSyu-7INu6CrglntxJVKOm-MXzgvCTZFu5GgtRCby3jqyLX7V3rW-ng0uUeG3-cQraqFck90pF7BnDpui6-UL4fcLQbEYIIuDIyAa0GhOBT6ogGtDT-Zcr5QA9GC3yC4CeGPZqmiz2_U_swGoUMMKMixHcrLhdoXTo47iT8soHr_HkbMJd6HLNI73k4SptsFXI8DepSV5hJsjgSkbkNpw');">
+<div class="absolute top-3 right-3 rounded-full bg-white/80 p-1.5 backdrop-blur-sm">
+<span class="material-symbols-outlined text-slate-900 text-sm font-bold">favorite</span>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-center gap-1 text-xs font-bold text-primary">
+<span class="material-symbols-outlined text-xs">star</span>
+<span>4.8 (89 reviews)</span>
+</div>
+<h4 class="mt-1 text-lg font-bold text-slate-900 dark:text-white">Starry Night Camping</h4>
+<p class="mt-1 text-sm text-slate-500">Yosemite • 2 days</p>
+<div class="mt-3 flex items-center justify-between">
+<p class="text-lg font-extrabold text-primary">$150<span class="text-xs font-normal text-slate-500">/person</span></p>
+<span class="material-symbols-outlined text-primary">arrow_forward_ios</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Call to Action Banner -->
+<div class="mx-6 mt-8 rounded-xl bg-primary p-8 text-center shadow-lg shadow-primary/20">
+<h3 class="text-2xl font-bold text-white">Join the Community</h3>
+<p class="mt-2 text-sm text-white/80">Save your favorite spots and get early access to exclusive deals.</p>
+<div class="mt-6 flex flex-col gap-3">
+<button class="w-full rounded-lg bg-white py-3 font-bold text-primary shadow-sm transition-transform active:scale-95">Sign Up for Free</button>
+<button class="w-full rounded-lg bg-primary/20 border border-white/30 py-3 font-bold text-white transition-transform active:scale-95">Log In</button>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/80 px-6 pb-6 pt-2 backdrop-blur-lg dark:border-slate-800 dark:bg-slate-900/80">
+<div class="flex items-center justify-between">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-bold">Explore</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] font-bold">Saved</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold">Profile</span>
+</a>
+</div>
+</div>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .fill-1 {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</body></html>
