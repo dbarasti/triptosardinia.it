@@ -35,7 +35,11 @@
     "upTo": "Fino a {max}",
     "hours": "{count}h",
     "minutes": "{count}m",
-    "days": "{count} giorni"
+    "days": "{count} giorni",
+    "reviewsFromGoogle": "Recensioni da Google",
+    "seeReviewsOnGoogle": "Vedi tutte le recensioni su Google",
+    "ratingCount": "{rating} · {count} recensioni su Google",
+    "ratingShort": "{rating} · {count}"
   },
   "interestForm": {
     "title": "Esprimi il tuo interesse",
@@ -107,6 +111,10 @@
     "providerEmail": "Email fornitore",
     "providerPhone": "Telefono fornitore",
     "published": "Pubblicato",
+    "googleMapsUrl": "URL Google Maps / Business",
+    "googleMapsUrlHint": "Opzionale. Link al profilo Google Maps o Business per mostrare le recensioni.",
+    "googlePlaceId": "ID luogo Google",
+    "googlePlaceIdHint": "Opzionale. Se l'URL Maps non mostra valutazione o numero di recensioni, incolla l'ID luogo (es. ChIJ...) dalla pagina del luogo o dal Place ID finder.",
     "slug": "Slug URL",
     "slugPlaceholder": "es. kayak-notturno",
     "area": "Area",

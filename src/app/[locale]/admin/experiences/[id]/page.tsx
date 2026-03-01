@@ -37,6 +37,8 @@ export default async function AdminExperienceEditPage({ params }: Props) {
     provider_booking_url: exp.provider_booking_url ?? undefined,
     provider_email: exp.provider_email ?? undefined,
     provider_phone: exp.provider_phone ?? undefined,
+    google_maps_url: exp.google_maps_url ?? undefined,
+    google_place_id: exp.google_place_id ?? undefined,
     published: exp.published,
   };
 

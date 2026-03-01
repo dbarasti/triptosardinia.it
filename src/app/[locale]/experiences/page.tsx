@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { getReviewsSummaryForExperiences } from '@/lib/google-reviews';
 import { setRequestLocale } from 'next-intl/server';
 import { ExperienceCards } from '@/components/ExperienceCards';
 import { HomeSearch } from '@/components/HomeSearch';
@@ -11,6 +12,7 @@ export default async function ExperiencesPage({ params, searchParams }: Props) {
   const { q } = await searchParams;
   setRequestLocale(locale);
   const experiences = await db.getExperiences({ search: q || undefined });
+  const ratings = await getReviewsSummaryForExperiences(experiences.map((e) => e.id));
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -25,7 +27,7 @@ export default async function ExperiencesPage({ params, searchParams }: Props) {
           {locale === 'it' ? 'Nessuna esperienza trovata.' : 'No experiences found.'}
         </p>
       ) : (
-        <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} />
+        <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} ratings={ratings} />
       )}
     </div>
   );

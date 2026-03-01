@@ -41,6 +41,10 @@ export interface Experience {
   provider_booking_url?: string | null;
   provider_email?: string | null;
   provider_phone?: string | null;
+  /** Google Maps or Business profile URL for reviews. Optional. */
+  google_maps_url?: string | null;
+  /** Resolved Google Place ID (optional; can be set after first fetch to avoid re-resolving URL). */
+  google_place_id?: string | null;
   created_at: string;
   updated_at: string;
   published: boolean;

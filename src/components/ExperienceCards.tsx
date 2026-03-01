@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import type { Experience } from '@/lib/types';
 import type { Locale } from '@/lib/types';
 import { useFavorites } from '@/lib/favorites';
@@ -15,11 +16,14 @@ function formatDuration(minutes: number, locale: string): string {
 export function ExperienceCards({
   experiences,
   locale,
+  ratings,
 }: {
   experiences: Experience[];
   locale: Locale;
+  ratings?: Record<string, { rating: number; user_ratings_total: number }>;
 }) {
   const { isFavorite, toggle } = useFavorites();
+  const t = useTranslations('experience');
 
   return (
     <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar">
@@ -60,7 +64,14 @@ export function ExperienceCards({
             <div className="p-4 flex-1 flex flex-col">
               <p className="text-xs font-bold text-primary flex items-center gap-1">
                 <span className="material-symbols-outlined text-xs">star</span>
-                <span>—</span>
+                <span>
+                  {ratings?.[exp.id] && ratings[exp.id].rating > 0
+                    ? t('ratingShort', {
+                        rating: ratings[exp.id].rating.toFixed(1),
+                        count: ratings[exp.id].user_ratings_total,
+                      })
+                    : '—'}
+                </span>
               </p>
               <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-white line-clamp-2">
                 <Link href={{ pathname: '/experiences/[slug]', params: { slug: exp.slug } }} className="hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">

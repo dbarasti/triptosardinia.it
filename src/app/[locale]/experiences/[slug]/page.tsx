@@ -3,7 +3,9 @@ import Image from 'next/image';
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from '@/lib/db';
+import { getReviewsForExperience } from '@/lib/google-reviews';
 import { ExperienceDetailClient } from '@/components/ExperienceDetailClient';
+import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import type { Locale } from '@/lib/types';
 import type { Metadata } from 'next';
 
@@ -46,6 +48,8 @@ export default async function ExperienceDetailPage({ params }: Props) {
   const title = locale === 'it' ? exp.title_it : exp.title_en;
   const description = locale === 'it' ? exp.description_it : exp.description_en;
   const locationName = locale === 'it' ? exp.location_name_it : exp.location_name_en;
+
+  const reviewsData = await getReviewsForExperience(exp.id);
 
   const hasProviderContact =
     !!exp.provider_booking_url || !!exp.provider_email || !!exp.provider_phone;
@@ -129,14 +133,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
       )}
 
       {/* Reviews placeholder */}
-      <section className="px-4 mt-8" aria-labelledby="reviews-heading">
-        <h2 id="reviews-heading" className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-          {t('reviews')}
-        </h2>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
-          {locale === 'it' ? 'Recensioni (in arrivo)' : 'Reviews (coming soon)'}
-        </p>
-      </section>
+      <GoogleReviewsSection data={reviewsData} locale={locale} />
 
       {/* CTA: Interest form or contact coming soon */}
       <ExperienceDetailClient

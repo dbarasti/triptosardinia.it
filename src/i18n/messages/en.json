@@ -35,7 +35,11 @@
     "upTo": "Up to {max}",
     "hours": "{count}h",
     "minutes": "{count}m",
-    "days": "{count} days"
+    "days": "{count} days",
+    "reviewsFromGoogle": "Reviews from Google",
+    "seeReviewsOnGoogle": "See all reviews on Google",
+    "ratingCount": "{rating} · {count} reviews on Google",
+    "ratingShort": "{rating} · {count}"
   },
   "interestForm": {
     "title": "Express your interest",
@@ -107,6 +111,10 @@
     "providerEmail": "Provider email",
     "providerPhone": "Provider phone",
     "published": "Published",
+    "googleMapsUrl": "Google Maps / Business URL",
+    "googleMapsUrlHint": "Optional. Link to Google Maps or Business profile to show reviews.",
+    "googlePlaceId": "Google Place ID",
+    "googlePlaceIdHint": "Optional. If the Maps URL doesn't show rating or review count, paste the Place ID (e.g. ChIJ...) from the place's page or the Place ID finder.",
     "slug": "URL slug",
     "slugPlaceholder": "e.g. moonlight-kayaking",
     "area": "Area",

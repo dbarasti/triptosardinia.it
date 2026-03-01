@@ -8,9 +8,11 @@ import type { Locale } from '@/lib/types';
 export function FavoritesListClient({
   experiences,
   locale,
+  ratings,
 }: {
   experiences: Experience[];
   locale: Locale;
+  ratings?: Record<string, { rating: number; user_ratings_total: number }>;
 }) {
   const { ids } = useFavorites();
   const filtered = experiences.filter((e) => ids.has(e.id));
@@ -25,5 +27,5 @@ export function FavoritesListClient({
     );
   }
 
-  return <ExperienceCards experiences={filtered} locale={locale} />;
+  return <ExperienceCards experiences={filtered} locale={locale} ratings={ratings} />;
 }

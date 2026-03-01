@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from '@/lib/db';
+import { getReviewsSummaryForExperiences } from '@/lib/google-reviews';
 import { HomeSearch } from '@/components/HomeSearch';
 import { CategoryPills } from '@/components/CategoryPills';
 import { ExperienceCards } from '@/components/ExperienceCards';
@@ -14,6 +15,7 @@ export default async function HomePage({ params }: Props) {
   const t = await getTranslations('home');
   const tCommon = await getTranslations('common');
   const experiences = await db.getExperiences();
+  const ratings = await getReviewsSummaryForExperiences(experiences.map((e) => e.id));
 
   return (
     <div className="relative flex flex-col overflow-x-hidden">
@@ -55,7 +57,7 @@ export default async function HomePage({ params }: Props) {
         <h2 id="experiences-heading" className="text-xl font-bold tracking-tight text-slate-900 dark:text-white pb-4">
           {t('trendingExperiences')}
         </h2>
-        <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} />
+        <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} ratings={ratings} />
       </section>
     </div>
   );

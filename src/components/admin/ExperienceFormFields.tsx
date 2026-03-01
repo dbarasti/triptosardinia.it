@@ -27,6 +27,8 @@ type Props = {
     provider_email?: string;
     provider_phone?: string;
     published: boolean;
+    google_maps_url?: string;
+    google_place_id?: string;
   };
 };
 
@@ -251,6 +253,34 @@ export function ExperienceFormFields({ areas, categories, locale, initial }: Pro
           defaultValue={initial?.provider_phone ?? ''}
           className={inputClass}
         />
+      </div>
+      <div>
+        <label htmlFor="google_maps_url" className="block text-slate-900 dark:text-white font-semibold mb-2">
+          {t('googleMapsUrl')}
+        </label>
+        <input
+          id="google_maps_url"
+          name="google_maps_url"
+          type="url"
+          defaultValue={initial?.google_maps_url ?? ''}
+          placeholder="https://www.google.com/maps/place/..."
+          className={inputClass}
+        />
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{t('googleMapsUrlHint')}</p>
+      </div>
+      <div>
+        <label htmlFor="google_place_id" className="block text-slate-900 dark:text-white font-semibold mb-2">
+          {t('googlePlaceId')}
+        </label>
+        <input
+          id="google_place_id"
+          name="google_place_id"
+          type="text"
+          defaultValue={initial?.google_place_id ?? ''}
+          placeholder="ChIJ..."
+          className={inputClass + ' font-mono text-sm'}
+        />
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{t('googlePlaceIdHint')}</p>
       </div>
       <label className="flex items-center gap-2 cursor-pointer">
         <input

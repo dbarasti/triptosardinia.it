@@ -45,11 +45,17 @@ CREATE TABLE IF NOT EXISTS experiences (
   provider_booking_url TEXT,
   provider_email TEXT,
   provider_phone TEXT,
+  google_maps_url TEXT,
+  google_place_id TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   published BOOLEAN NOT NULL DEFAULT true,
   UNIQUE(slug)
 );
+
+-- Optional: for existing DBs that were created before google_maps_url was added
+ALTER TABLE experiences ADD COLUMN IF NOT EXISTS google_maps_url TEXT;
+ALTER TABLE experiences ADD COLUMN IF NOT EXISTS google_place_id TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_experiences_slug ON experiences(slug);
 CREATE INDEX IF NOT EXISTS idx_experiences_area ON experiences(area_id);
@@ -90,6 +96,16 @@ CREATE TABLE IF NOT EXISTS admin_users (
 );
 
 CREATE INDEX IF NOT EXISTS idx_admin_users_username ON admin_users(username);
+
+-- Cache for Google Place reviews (TTL ~24–72h per Google ToS)
+CREATE TABLE IF NOT EXISTS experience_google_reviews (
+  experience_id TEXT PRIMARY KEY REFERENCES experiences(id) ON DELETE CASCADE,
+  place_id TEXT NOT NULL,
+  rating DOUBLE PRECISION,
+  user_ratings_total INTEGER,
+  reviews JSONB NOT NULL DEFAULT '[]',
+  fetched_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
 -- Seed data (idempotent: insert only if tables are empty)
 INSERT INTO areas (id, slug, name_en, name_it, description_en, description_it)

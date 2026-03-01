@@ -77,6 +77,8 @@ function rowToExperience(row: Record<string, unknown>): Experience {
     provider_booking_url: row.provider_booking_url as string | null | undefined,
     provider_email: row.provider_email as string | null | undefined,
     provider_phone: row.provider_phone as string | null | undefined,
+    google_maps_url: row.google_maps_url as string | null | undefined,
+    google_place_id: row.google_place_id as string | null | undefined,
     created_at: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
     updated_at: row.updated_at instanceof Date ? row.updated_at.toISOString() : String(row.updated_at),
     published: Boolean(row.published),
@@ -285,7 +287,7 @@ export const dbPg = {
       'slug', 'area_id', 'category_id', 'title_en', 'title_it', 'description_en', 'description_it',
       'image_urls', 'duration_minutes', 'group_size_max', 'difficulty',
       'location_name_en', 'location_name_it', 'location_lat', 'location_lng',
-      'provider_booking_url', 'provider_email', 'provider_phone', 'published',
+      'provider_booking_url', 'provider_email', 'provider_phone', 'google_maps_url', 'google_place_id', 'published',
     ] as const;
     for (const key of allowed) {
       const v = data[key];
@@ -319,8 +321,8 @@ export const dbPg = {
         id, slug, area_id, category_id, title_en, title_it, description_en, description_it,
         image_urls, duration_minutes, group_size_max, difficulty,
         location_name_en, location_name_it, location_lat, location_lng,
-        provider_booking_url, provider_email, provider_phone, published
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`,
+        provider_booking_url, provider_email, provider_phone, google_maps_url, google_place_id, published
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`,
       [
         id,
         data.slug,
@@ -341,6 +343,8 @@ export const dbPg = {
         data.provider_booking_url ?? null,
         data.provider_email ?? null,
         data.provider_phone ?? null,
+        data.google_maps_url ?? null,
+        data.google_place_id ?? null,
         data.published,
       ]
     );
@@ -351,6 +355,7 @@ export const dbPg = {
 
   async deleteExperience(id: string): Promise<boolean> {
     const pool = getPool();
+    await pool.query('DELETE FROM experience_google_reviews WHERE experience_id = $1', [id]);
     await pool.query('DELETE FROM interest_events WHERE experience_id = $1', [id]);
     await pool.query('DELETE FROM experience_view_events WHERE experience_id = $1', [id]);
     const res = await pool.query('DELETE FROM experiences WHERE id = $1', [id]);
@@ -370,5 +375,68 @@ export const dbPg = {
       username: row.username as string,
       password_hash: row.password_hash as string,
     };
+  },
+
+  async getGoogleReviewsCache(experienceId: string): Promise<{ place_id: string; rating: number; user_ratings_total: number; reviews: unknown[]; fetched_at: string } | null> {
+    const pool = getPool();
+    const res = await pool.query(
+      'SELECT place_id, rating, user_ratings_total, reviews, fetched_at FROM experience_google_reviews WHERE experience_id = $1',
+      [experienceId]
+    );
+    const row = res.rows[0];
+    if (!row) return null;
+    const reviews = row.reviews as unknown;
+    return {
+      place_id: row.place_id as string,
+      rating: Number(row.rating),
+      user_ratings_total: Number(row.user_ratings_total ?? 0),
+      reviews: Array.isArray(reviews) ? reviews : (reviews ? JSON.parse(String(reviews)) : []),
+      fetched_at: row.fetched_at instanceof Date ? row.fetched_at.toISOString() : String(row.fetched_at),
+    };
+  },
+
+  async getGoogleReviewsCacheBatch(
+    experienceIds: string[]
+  ): Promise<Record<string, { rating: number; user_ratings_total: number; fetched_at: string }>> {
+    if (experienceIds.length === 0) return {};
+    const pool = getPool();
+    const res = await pool.query(
+      'SELECT experience_id, rating, user_ratings_total, fetched_at FROM experience_google_reviews WHERE experience_id = ANY($1)',
+      [experienceIds]
+    );
+    const result: Record<string, { rating: number; user_ratings_total: number; fetched_at: string }> = {};
+    for (const row of res.rows) {
+      const id = row.experience_id as string;
+      const rating = Number(row.rating);
+      if (rating > 0) {
+        result[id] = {
+          rating,
+          user_ratings_total: Number(row.user_ratings_total ?? 0),
+          fetched_at: row.fetched_at instanceof Date ? row.fetched_at.toISOString() : String(row.fetched_at),
+        };
+      }
+    }
+    return result;
+  },
+
+  async setGoogleReviewsCache(
+    experienceId: string,
+    placeId: string,
+    rating: number | null,
+    userRatingsTotal: number | null,
+    reviews: unknown[]
+  ): Promise<void> {
+    const pool = getPool();
+    await pool.query(
+      `INSERT INTO experience_google_reviews (experience_id, place_id, rating, user_ratings_total, reviews, fetched_at)
+       VALUES ($1, $2, $3, $4, $5::jsonb, NOW())
+       ON CONFLICT (experience_id) DO UPDATE SET
+         place_id = EXCLUDED.place_id,
+         rating = EXCLUDED.rating,
+         user_ratings_total = EXCLUDED.user_ratings_total,
+         reviews = EXCLUDED.reviews,
+         fetched_at = NOW()`,
+      [experienceId, placeId, rating, userRatingsTotal, JSON.stringify(reviews)]
+    );
   },
 };

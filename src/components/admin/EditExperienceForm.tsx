@@ -29,6 +29,8 @@ type Props = {
     provider_email?: string;
     provider_phone?: string;
     published: boolean;
+    google_maps_url?: string;
+    google_place_id?: string;
   };
 };
 

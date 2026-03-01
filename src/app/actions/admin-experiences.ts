@@ -38,6 +38,8 @@ function parseFormData(form: FormData): { data: ExperienceFormData; errors: stri
   const provider_booking_url = (form.get('provider_booking_url') as string)?.trim() || null;
   const provider_email = (form.get('provider_email') as string)?.trim() || null;
   const provider_phone = (form.get('provider_phone') as string)?.trim() || null;
+  const google_maps_url = (form.get('google_maps_url') as string)?.trim() || null;
+  const google_place_id = (form.get('google_place_id') as string)?.trim() || null;
   const published = form.get('published') === 'on' || form.get('published') === 'true';
 
   if (!title_en) errors.push('Title (English) is required');
@@ -68,6 +70,8 @@ function parseFormData(form: FormData): { data: ExperienceFormData; errors: stri
     provider_booking_url,
     provider_email,
     provider_phone,
+    google_maps_url,
+    google_place_id,
     published,
   };
   return { data, errors };
@@ -95,6 +99,10 @@ export async function updateExperienceAction(id: string, formData: FormData): Pr
     revalidatePath('/admin');
     revalidatePath('/admin/experiences');
     revalidatePath(`/admin/experiences/${id}`);
+    if (updated.slug) {
+      revalidatePath(`/en/experiences/${updated.slug}`);
+      revalidatePath(`/it/experiences/${updated.slug}`);
+    }
     return { ok: true };
   } catch (e) {
     return { ok: false, errors: [String(e)] };

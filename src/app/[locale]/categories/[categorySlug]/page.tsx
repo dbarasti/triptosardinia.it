@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from '@/lib/db';
+import { getReviewsSummaryForExperiences } from '@/lib/google-reviews';
 import { ExperienceCards } from '@/components/ExperienceCards';
 
 type Props = { params: Promise<{ locale: string; categorySlug: string }> };
@@ -11,6 +12,7 @@ export default async function CategoryPage({ params }: Props) {
   const category = await db.getCategoryBySlug(categorySlug);
   if (!category) notFound();
   const experiences = await db.getExperiences({ categorySlug });
+  const ratings = await getReviewsSummaryForExperiences(experiences.map((e) => e.id));
 
   const name = locale === 'it' ? category.name_it : category.name_en;
 
@@ -22,7 +24,7 @@ export default async function CategoryPage({ params }: Props) {
           {locale === 'it' ? 'Nessuna esperienza in questa categoria.' : 'No experiences in this category.'}
         </p>
       ) : (
-        <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} />
+        <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} ratings={ratings} />
       )}
     </div>
   );

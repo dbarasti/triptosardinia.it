@@ -90,6 +90,9 @@ const experiences: Experience[] = [
 const interestEvents: InterestEvent[] = [];
 const viewEvents: ExperienceViewEvent[] = [];
 
+const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const googleReviewsCache = new Map<string, { place_id: string; rating: number; user_ratings_total: number; reviews: unknown[]; fetched_at: string }>();
+
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 const rateLimitMap = new Map<string, number[]>();
@@ -243,6 +246,7 @@ export const dbMemory = {
   async deleteExperience(id: string): Promise<boolean> {
     const idx = experiences.findIndex((e) => e.id === id);
     if (idx === -1) return false;
+    googleReviewsCache.delete(id);
     experiences.splice(idx, 1);
     while (interestEvents.some((e) => e.experience_id === id)) {
       const i = interestEvents.findIndex((e) => e.experience_id === id);
@@ -257,5 +261,48 @@ export const dbMemory = {
 
   async getAdminUserByUsername(_username: string): Promise<{ id: string; username: string; password_hash: string } | null> {
     return null;
+  },
+
+  async getGoogleReviewsCache(experienceId: string): Promise<{ place_id: string; rating: number; user_ratings_total: number; reviews: unknown[]; fetched_at: string } | null> {
+    const entry = googleReviewsCache.get(experienceId);
+    if (!entry) return null;
+    if (Date.now() - new Date(entry.fetched_at).getTime() > CACHE_TTL_MS) {
+      googleReviewsCache.delete(experienceId);
+      return null;
+    }
+    return entry;
+  },
+
+  async getGoogleReviewsCacheBatch(
+    experienceIds: string[]
+  ): Promise<Record<string, { rating: number; user_ratings_total: number; fetched_at: string }>> {
+    const result: Record<string, { rating: number; user_ratings_total: number; fetched_at: string }> = {};
+    for (const id of experienceIds) {
+      const entry = await this.getGoogleReviewsCache(id);
+      if (entry && entry.rating > 0) {
+        result[id] = {
+          rating: entry.rating,
+          user_ratings_total: entry.user_ratings_total,
+          fetched_at: entry.fetched_at,
+        };
+      }
+    }
+    return result;
+  },
+
+  async setGoogleReviewsCache(
+    experienceId: string,
+    placeId: string,
+    rating: number | null,
+    userRatingsTotal: number | null,
+    reviews: unknown[]
+  ): Promise<void> {
+    googleReviewsCache.set(experienceId, {
+      place_id: placeId,
+      rating: rating ?? 0,
+      user_ratings_total: userRatingsTotal ?? 0,
+      reviews,
+      fetched_at: new Date().toISOString(),
+    });
   },
 };
