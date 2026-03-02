@@ -55,7 +55,7 @@ export function EditExperienceForm({ experienceId, areas, categories, locale, in
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <ExperienceFormFields areas={areas} categories={categories} locale={locale} initial={initial} />
+      <ExperienceFormFields areas={areas} categories={categories} locale={locale} experienceId={experienceId} initial={initial} />
       {result?.errors && result.errors.length > 0 && (
         <ul className="text-sm text-red-600 dark:text-red-400 list-disc list-inside">
           {result.errors.map((e, i) => (

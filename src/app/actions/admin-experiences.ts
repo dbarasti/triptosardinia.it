@@ -2,7 +2,50 @@
 
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
+import { getSupabaseServer } from '@/lib/supabase-server';
 import type { Experience } from '@/lib/types';
+import path from 'path';
+import fs from 'fs/promises';
+
+const MEDIA_BUCKET = 'media';
+const PUBLIC_MEDIA = path.join(process.cwd(), 'public', MEDIA_BUCKET);
+
+export async function uploadExperienceMedia(
+  experienceId: string | null,
+  formData: FormData
+): Promise<{ ok: boolean; paths?: string[]; error?: string }> {
+  const prefix = experienceId || '_draft';
+  const files = formData.getAll('files') as File[];
+  if (!files.length) return { ok: false, error: 'No files' };
+  const allowedTypes = /^image\/(jpeg|png|gif|webp)|video\/(mp4|webm)$/i;
+  const paths: string[] = [];
+  const supabase = getSupabaseServer();
+
+  for (const file of files) {
+    if (!file.size || !allowedTypes.test(file.type)) continue;
+    const ext = path.extname(file.name) || (file.type.startsWith('video/') ? '.mp4' : '.jpg');
+    const base = path.basename(file.name, path.extname(file.name)).replace(/\s+/g, '-').slice(0, 40);
+    const key = `${crypto.randomUUID().slice(0, 8)}-${base}${ext}`;
+    const storedPath = `media/experiences/${prefix}/images/${key}`;
+    const objectKey = `experiences/${prefix}/images/${key}`;
+
+    if (supabase) {
+      const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(objectKey, file, {
+        contentType: file.type,
+        upsert: true,
+      });
+      if (error) return { ok: false, error: error.message };
+    } else {
+      const dir = path.join(PUBLIC_MEDIA, 'experiences', prefix, 'images');
+      await fs.mkdir(dir, { recursive: true });
+      const dest = path.join(dir, key);
+      const buf = Buffer.from(await file.arrayBuffer());
+      await fs.writeFile(dest, buf);
+    }
+    paths.push(storedPath);
+  }
+  return paths.length ? { ok: true, paths } : { ok: false, error: 'No valid files' };
+}
 
 export async function setExperiencePublished(id: string, published: boolean): Promise<{ ok: boolean; error?: string }> {
   try {

@@ -142,7 +142,7 @@ INSERT INTO experiences (
     'Kayak nella Laguna Blu',
     'Kayak in crystal-clear waters along the northern coast. Half-day adventure with local guide.',
     'Kayak nelle acque cristalline lungo la costa settentrionale. Avventura di mezza giornata con guida locale.',
-    '["https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800","https://images.unsplash.com/photo-1573790387438-4da905039392?w=800"]'::jsonb,
+    '["media/experiences/exp-1/images/kids_sailing1.jpeg","media/experiences/exp-1/images/sailing1.mp4","media/experiences/exp-1/images/bouldering_outdoor1.jpeg"]'::jsonb,
     240, 10, 'medium', 'Costa Smeralda', 'Costa Smeralda',
     'https://example-provider.com/kayak', 'book@example-provider.com', '+39 123 456 7890',
     true
@@ -156,7 +156,7 @@ INSERT INTO experiences (
     'Esperienza subacquea a Stintino',
     'Dive in the marine protected area. Suitable for certified divers.',
     'Immersione nell''area marina protetta. Adatto a subacquei certificati.',
-    '["https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800"]'::jsonb,
+    '["media/experiences/exp-1/images/kids_sailing1.jpeg"]'::jsonb,
     360, 8, 'medium', 'Stintino', 'Stintino',
     'https://example-diving.com', NULL, NULL,
     true
@@ -170,7 +170,7 @@ INSERT INTO experiences (
     'Escursione in montagna (Contatti in arrivo)',
     'Scenic hike. Provider contact details coming soon.',
     'Escursione panoramica. Dettagli contatto fornitore in arrivo.',
-    '["https://images.unsplash.com/photo-1551632811-561732d1e306?w=800"]'::jsonb,
+    '["media/experiences/exp-1/images/trekking1.jpeg","media/experiences/exp-1/images/yoga_outdoor.jpeg"]'::jsonb,
     480, 12, NULL, NULL, NULL,
     NULL, NULL, NULL,
     true

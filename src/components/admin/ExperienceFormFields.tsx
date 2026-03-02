@@ -1,6 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useState, useRef } from 'react';
+import { uploadExperienceMedia } from '@/app/actions/admin-experiences';
+import { getImageUrl } from '@/lib/image-utils';
 
 type Area = { id: string; name_en: string; name_it: string };
 type Category = { id: string; name_en: string; name_it: string };
@@ -9,6 +12,8 @@ type Props = {
   areas: Area[];
   categories: Category[];
   locale: string;
+  /** When provided (edit flow), show file upload. Omit for create flow. */
+  experienceId?: string;
   initial?: {
     title_en: string;
     title_it: string;
@@ -35,10 +40,32 @@ type Props = {
 const inputClass =
   'w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 text-slate-900 dark:text-white';
 
-export function ExperienceFormFields({ areas, categories, locale, initial }: Props) {
+export function ExperienceFormFields({ areas, categories, locale, experienceId, initial }: Props) {
   const t = useTranslations('admin');
+  const [imageUrls, setImageUrls] = useState<string[]>(initial?.image_urls ?? []);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const name = (a: Area) => (locale === 'it' ? a.name_it : a.name_en);
   const catName = (c: Category) => (locale === 'it' ? c.name_it : c.name_en);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files?.length) return;
+    setUploadError(null);
+    setUploading(true);
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) formData.append('files', files[i]);
+    const result = await uploadExperienceMedia(experienceId ?? null, formData);
+    setUploading(false);
+    if (result.ok && result.paths?.length) {
+      setImageUrls((prev) => [...prev, ...result.paths!]);
+    } else if (result.error) {
+      setUploadError(result.error);
+    }
+    e.target.value = '';
+    fileInputRef.current?.focus({ preventScroll: true });
+  };
 
   return (
     <div className="space-y-6">
@@ -142,15 +169,53 @@ export function ExperienceFormFields({ areas, categories, locale, initial }: Pro
         <label htmlFor="image_urls" className="block text-slate-900 dark:text-white font-semibold mb-2">
           {t('imageUrls')}
         </label>
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm"
+            multiple
+            disabled={uploading}
+            onChange={handleFileChange}
+            className="block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-primary file:font-semibold file:cursor-pointer hover:file:bg-primary/20"
+          />
+          {uploading && <span className="text-sm text-slate-500">{t('uploading') || 'Uploading…'}</span>}
+          {uploadError && <span className="text-sm text-red-600 dark:text-red-400">{uploadError}</span>}
+        </div>
+        {imageUrls.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {imageUrls.map((url, i) => (
+              <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0">
+                {/\.(mp4|webm)$/i.test(url) ? (
+                  <video src={getImageUrl(url)} className="w-full h-full object-cover" muted playsInline />
+                ) : (
+                  <img src={getImageUrl(url)} alt="" className="w-full h-full object-cover" />
+                )}
+                <button
+                  type="button"
+                  onClick={() => setImageUrls((prev) => prev.filter((_, j) => j !== i))}
+                  className="absolute top-0.5 right-0.5 rounded-full bg-black/60 text-white p-0.5 hover:bg-black/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  aria-label="Remove"
+                >
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         <textarea
           id="image_urls"
           name="image_urls"
           rows={3}
           required
-          defaultValue={initial?.image_urls?.join('\n')}
-          placeholder="https://..."
+          value={imageUrls.join('\n')}
+          onChange={(e) => setImageUrls(e.target.value.split(/\r?\n/).map((u) => u.trim()).filter(Boolean))}
+          placeholder="https://... or upload above"
           className={inputClass + ' font-mono text-sm resize-none'}
         />
+        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          {t('imageUrlsHintUpload') || 'Add URLs (one per line) or upload files above.'}
+        </p>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>

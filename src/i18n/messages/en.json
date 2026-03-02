@@ -125,6 +125,8 @@
     "locationEn": "Location (English)",
     "locationIt": "Location (Italian)",
     "imageUrls": "Image URLs (one per line)",
+    "imageUrlsHintUpload": "Add URLs (one per line) or upload files above.",
+    "uploading": "Uploading…",
     "delete": "Delete",
     "deleteConfirm": "Are you sure you want to delete this experience?"
   },

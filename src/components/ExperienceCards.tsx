@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import type { Experience } from '@/lib/types';
 import type { Locale } from '@/lib/types';
 import { useFavorites } from '@/lib/favorites';
+import { getImageUrl } from '@/lib/image-utils';
 
 function formatDuration(minutes: number, locale: string): string {
   if (minutes >= 24 * 60) return `${Math.round(minutes / (24 * 60))} days`;
@@ -39,7 +40,7 @@ export function ExperienceCards({
             <div className="relative h-44 w-full flex-shrink-0">
               <Link href={{ pathname: '/experiences/[slug]', params: { slug: exp.slug } }} className="block h-full w-full">
                 <Image
-                  src={exp.image_urls[0] || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800'}
+                  src={getImageUrl(exp.image_urls[0]) || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800'}
                   alt=""
                   width={280}
                   height={176}

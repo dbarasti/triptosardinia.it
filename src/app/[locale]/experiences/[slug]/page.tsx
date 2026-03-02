@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
+import { getImageUrl } from '@/lib/image-utils';
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from '@/lib/db';
 import { getReviewsForExperience } from '@/lib/google-reviews';
+import { ExperienceDetailCarousel } from '@/components/ExperienceDetailCarousel';
 import { ExperienceDetailClient } from '@/components/ExperienceDetailClient';
 import { GoogleReviewsSection } from '@/components/GoogleReviewsSection';
 import type { Locale } from '@/lib/types';
@@ -19,6 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = locale === 'it' ? exp.description_it : exp.description_en;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   const path = `/${locale}/experiences/${slug}`;
+  const ogImageUrl = exp.image_urls[0] ? `${baseUrl}${getImageUrl(exp.image_urls[0])}` : undefined;
   return {
     title,
     description: description.slice(0, 160),
@@ -26,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description: description.slice(0, 160),
       url: `${baseUrl}${path}`,
-      images: exp.image_urls[0] ? [{ url: exp.image_urls[0], width: 800, height: 600 }] : undefined,
+      images: ogImageUrl ? [{ url: ogImageUrl, width: 800, height: 600 }] : undefined,
       locale: locale === 'it' ? 'it_IT' : 'en_US',
       type: 'website',
     },
@@ -59,7 +61,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
     '@type': 'Product',
     name: title,
     description,
-    image: exp.image_urls,
+    image: exp.image_urls.map((url) => (url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${getImageUrl(url)}`)),
     ...(exp.provider_booking_url && { url: exp.provider_booking_url }),
   };
 
@@ -69,23 +71,8 @@ export default async function ExperienceDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Carousel */}
-      <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 py-4 no-scrollbar">
-        {exp.image_urls.map((url, i) => (
-          <div key={i} className="flex-none w-[85%] snap-center">
-            <Image
-              src={url}
-              alt=""
-              width={600}
-              height={450}
-              className="w-full aspect-[4/3] object-cover rounded-xl shadow-sm"
-              sizes="85vw"
-              priority={i === 0}
-              loading={i === 0 ? undefined : 'lazy'}
-            />
-          </div>
-        ))}
-      </div>
+      {/* Carousel (images and videos; videos autoplay when in view) */}
+      <ExperienceDetailCarousel imageUrls={exp.image_urls} />
 
       <div className="px-4">
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">{title}</h1>

@@ -31,8 +31,9 @@ const experiences: Experience[] = [
     description_en: 'Kayak in crystal-clear waters along the northern coast. Half-day adventure with local guide.',
     description_it: 'Kayak nelle acque cristalline lungo la costa settentrionale. Avventura di mezza giornata con guida locale.',
     image_urls: [
-      'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800',
-      'https://images.unsplash.com/photo-1573790387438-4da905039392?w=800',
+      'media/experiences/exp-1/images/bouldering_outdoor1.jpeg',
+      'media/experiences/exp-1/images/kids_sailing1.jpeg',
+      'media/experiences/exp-1/images/sailing1.mp4',
     ],
     duration_minutes: 240,
     group_size_max: 10,

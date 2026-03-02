@@ -1,6 +1,7 @@
 import { setRequestLocale } from 'next-intl/server';
 import { getTranslations } from 'next-intl/server';
 import { db } from '@/lib/db';
+import { getImageUrl } from '@/lib/image-utils';
 import { Link } from '@/i18n/routing';
 import { AdminExperienceSearch } from '@/components/admin/AdminExperienceSearch';
 import { ExperienceRow } from '@/components/admin/ExperienceRow';
@@ -61,7 +62,7 @@ export default async function AdminExperiencesPage({ params, searchParams }: Pro
               title={locale === 'it' ? exp.title_it : exp.title_en}
               updatedAt={exp.updated_at}
               leadsCount={leadCountByExp.get(exp.id) ?? 0}
-              imageUrl={exp.image_urls[0]}
+              imageUrl={getImageUrl(exp.image_urls[0])}
               locale={locale}
             />
           ))

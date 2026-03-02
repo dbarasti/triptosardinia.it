@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { setExperiencePublished, deleteExperienceAction } from '@/app/actions/admin-experiences';
 import { Link } from '@/i18n/routing';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/image-utils';
 
 type Props = {
   experienceId: string;
@@ -60,7 +61,7 @@ export function ExperienceRow({ experienceId, published, title, updatedAt, leads
       >
         <div className="relative bg-slate-200 dark:bg-slate-700 rounded-xl size-20 shrink-0 overflow-hidden">
           <Image
-            src={imageUrl || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200'}
+            src={getImageUrl(imageUrl) || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=200'}
             alt=""
             width={80}
             height={80}

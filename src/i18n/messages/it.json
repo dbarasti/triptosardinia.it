@@ -125,6 +125,8 @@
     "locationEn": "Località (inglese)",
     "locationIt": "Località (italiano)",
     "imageUrls": "URL immagini (uno per riga)",
+    "imageUrlsHintUpload": "Aggiungi URL (uno per riga) o carica file sopra.",
+    "uploading": "Caricamento…",
     "delete": "Elimina",
     "deleteConfirm": "Eliminare questa esperienza?"
   },

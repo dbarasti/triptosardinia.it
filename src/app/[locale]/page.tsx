@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from '@/lib/db';
 import { getReviewsSummaryForExperiences } from '@/lib/google-reviews';
+import { getImageUrl } from '@/lib/image-utils';
 import { HomeSearch } from '@/components/HomeSearch';
 import { CategoryPills } from '@/components/CategoryPills';
 import { ExperienceCards } from '@/components/ExperienceCards';
@@ -24,7 +25,7 @@ export default async function HomePage({ params }: Props) {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1920')",
+            backgroundImage: `url('${getImageUrl(process.env.NEXT_PUBLIC_HERO_IMAGE_URL) || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1920'}')`,
           }}
           aria-hidden
         />
