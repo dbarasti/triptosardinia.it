@@ -87,7 +87,7 @@ export function ExperienceCards({
                   href={{ pathname: '/experiences/[slug]', params: { slug: exp.slug } }}
                   className="inline-flex items-center gap-1 text-primary font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
                 >
-                  View
+                  {t('view')}
                   <span className="material-symbols-outlined text-sm">arrow_forward_ios</span>
                 </Link>
               </div>

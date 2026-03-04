@@ -14,6 +14,7 @@ export function AdminNav() {
   const isExperiences = pathname?.startsWith('/admin/experiences') && pathname !== '/admin/experiences/new';
   const isLeads = pathname === '/admin/leads';
   const isAnalytics = pathname === '/admin/analytics';
+  const isSettings = pathname === '/admin/settings';
   const isLogin = pathname === '/admin/login';
 
   const linkClass = (active: boolean) =>
@@ -48,6 +49,12 @@ export function AdminNav() {
               bar_chart
             </span>
             {t('analytics')}
+          </Link>
+          <Link href="/admin/settings" className={linkClass(isSettings)}>
+            <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: isSettings ? "'FILL' 1" : undefined }}>
+              settings
+            </span>
+            {t('settings')}
           </Link>
           {session && status === 'authenticated' && (
             <button

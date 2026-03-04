@@ -2,8 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 import { useState, useRef } from 'react';
-import { uploadExperienceMedia } from '@/app/actions/admin-experiences';
+import { uploadExperienceMedia, replaceExperienceMedia } from '@/app/actions/admin-experiences';
 import { getImageUrl } from '@/lib/image-utils';
+import { ImageCropModal } from './ImageCropModal';
 
 type Area = { id: string; name_en: string; name_it: string };
 type Category = { id: string; name_en: string; name_it: string };
@@ -45,6 +46,8 @@ export function ExperienceFormFields({ areas, categories, locale, experienceId, 
   const [imageUrls, setImageUrls] = useState<string[]>(initial?.image_urls ?? []);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [cropModal, setCropModal] = useState<{ imageUrl: string; path: string } | null>(null);
+  const [thumbVersions, setThumbVersions] = useState<Record<number, number>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const name = (a: Area) => (locale === 'it' ? a.name_it : a.name_en);
   const catName = (c: Category) => (locale === 'it' ? c.name_it : c.name_en);
@@ -65,6 +68,20 @@ export function ExperienceFormFields({ areas, categories, locale, experienceId, 
     }
     e.target.value = '';
     fileInputRef.current?.focus({ preventScroll: true });
+  };
+
+  const handleCropSave = async (blob: Blob, index: number) => {
+    if (!cropModal) return;
+    const formData = new FormData();
+    const ext = cropModal.path.match(/\.(jpe?g|png|gif|webp)$/i)?.[0] ?? '.jpg';
+    formData.set('file', blob, `image${ext}`);
+    const result = await replaceExperienceMedia(cropModal.path, formData);
+    if (result.ok) {
+      setThumbVersions((v) => ({ ...v, [index]: Date.now() }));
+      setCropModal(null);
+    } else {
+      setUploadError(result.error ?? 'Replace failed');
+    }
   };
 
   return (
@@ -173,7 +190,7 @@ export function ExperienceFormFields({ areas, categories, locale, experienceId, 
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm"
+            accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm,video/quicktime"
             multiple
             disabled={uploading}
             onChange={handleFileChange}
@@ -184,24 +201,48 @@ export function ExperienceFormFields({ areas, categories, locale, experienceId, 
         </div>
         {imageUrls.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
-            {imageUrls.map((url, i) => (
-              <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0">
-                {/\.(mp4|webm)$/i.test(url) ? (
-                  <video src={getImageUrl(url)} className="w-full h-full object-cover" muted playsInline />
-                ) : (
-                  <img src={getImageUrl(url)} alt="" className="w-full h-full object-cover" />
-                )}
-                <button
-                  type="button"
-                  onClick={() => setImageUrls((prev) => prev.filter((_, j) => j !== i))}
-                  className="absolute top-0.5 right-0.5 rounded-full bg-black/60 text-white p-0.5 hover:bg-black/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                  aria-label="Remove"
-                >
-                  <span className="material-symbols-outlined text-sm">close</span>
-                </button>
-              </div>
-            ))}
+            {imageUrls.map((url, i) => {
+              const isVideo = /\.(mp4|webm|mov)$/i.test(url);
+              const thumbSrc = getImageUrl(url) + (thumbVersions[i] ? `?v=${thumbVersions[i]}` : '');
+              return (
+                <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0 group">
+                  {isVideo ? (
+                    <video src={getImageUrl(url)} className="w-full h-full object-cover" muted playsInline />
+                  ) : (
+                    <img src={thumbSrc} alt="" className="w-full h-full object-cover" />
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                    {!isVideo && (
+                      <button
+                        type="button"
+                        onClick={() => setCropModal({ imageUrl: getImageUrl(url), path: url })}
+                        className="rounded-full p-1.5 bg-white/90 text-slate-800 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        aria-label={t('editImage')}
+                        title={t('editImage')}
+                      >
+                        <span className="material-symbols-outlined text-sm">crop</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setImageUrls((prev) => prev.filter((_, j) => j !== i))}
+                      className="rounded-full p-1.5 bg-white/90 text-slate-800 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                      aria-label="Remove"
+                    >
+                      <span className="material-symbols-outlined text-sm">close</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+        )}
+        {cropModal && (
+          <ImageCropModal
+            imageSrc={cropModal.imageUrl}
+            onSave={(blob) => handleCropSave(blob, imageUrls.indexOf(cropModal.path))}
+            onCancel={() => setCropModal(null)}
+          />
         )}
         <textarea
           id="image_urls"

@@ -1,5 +1,5 @@
 /**
- * Tests for CoastExperience documented features:
+ * Tests for Trip to Sardinia documented features:
  * - Interest event storage and validation
  * - Rate limiting on interest submissions
  * Uses in-memory db when DATABASE_URL is not set.

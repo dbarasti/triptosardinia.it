@@ -1,4 +1,4 @@
--- CoastExperience PostgreSQL schema
+-- Trip to Sardinia PostgreSQL schema
 -- Run this against your local (or Supabase) Postgres to create tables and seed data.
 -- Usage: psql $DATABASE_URL -f scripts/schema.sql
 
@@ -97,7 +97,13 @@ CREATE TABLE IF NOT EXISTS admin_users (
 
 CREATE INDEX IF NOT EXISTS idx_admin_users_username ON admin_users(username);
 
--- Cache for Google Place reviews (TTL ~24–72h per Google ToS)
+-- Site settings (e.g. hero_image_path for homepage background)
+CREATE TABLE IF NOT EXISTS site_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+-- Cache for Google Place reviews
 CREATE TABLE IF NOT EXISTS experience_google_reviews (
   experience_id TEXT PRIMARY KEY REFERENCES experiences(id) ON DELETE CASCADE,
   place_id TEXT NOT NULL,
@@ -127,52 +133,3 @@ INSERT INTO categories (id, slug, name_en, name_it, icon) VALUES
   ('cat-camping', 'camping', 'Camping', 'Campeggio', 'camping')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO experiences (
-  id, slug, area_id, category_id, title_en, title_it,
-  description_en, description_it, image_urls, duration_minutes, group_size_max,
-  difficulty, location_name_en, location_name_it,
-  provider_booking_url, provider_email, provider_phone, published
-) VALUES
-  (
-    'exp-1',
-    'blue-lagoon-kayaking',
-    'area-northern-sardinia',
-    'cat-kayaking',
-    'Blue Lagoon Kayaking',
-    'Kayak nella Laguna Blu',
-    'Kayak in crystal-clear waters along the northern coast. Half-day adventure with local guide.',
-    'Kayak nelle acque cristalline lungo la costa settentrionale. Avventura di mezza giornata con guida locale.',
-    '["media/experiences/exp-1/images/kids_sailing1.jpeg","media/experiences/exp-1/images/sailing1.mp4","media/experiences/exp-1/images/bouldering_outdoor1.jpeg"]'::jsonb,
-    240, 10, 'medium', 'Costa Smeralda', 'Costa Smeralda',
-    'https://example-provider.com/kayak', 'book@example-provider.com', '+39 123 456 7890',
-    true
-  ),
-  (
-    'exp-2',
-    'stintino-diving',
-    'area-northern-sardinia',
-    'cat-diving',
-    'Stintino Diving Experience',
-    'Esperienza subacquea a Stintino',
-    'Dive in the marine protected area. Suitable for certified divers.',
-    'Immersione nell''area marina protetta. Adatto a subacquei certificati.',
-    '["media/experiences/exp-1/images/kids_sailing1.jpeg"]'::jsonb,
-    360, 8, 'medium', 'Stintino', 'Stintino',
-    'https://example-diving.com', NULL, NULL,
-    true
-  ),
-  (
-    'exp-3',
-    'contact-coming-soon',
-    'area-northern-sardinia',
-    'cat-hiking',
-    'Mountain Hike (Contact coming soon)',
-    'Escursione in montagna (Contatti in arrivo)',
-    'Scenic hike. Provider contact details coming soon.',
-    'Escursione panoramica. Dettagli contatto fornitore in arrivo.',
-    '["media/experiences/exp-1/images/trekking1.jpeg","media/experiences/exp-1/images/yoga_outdoor.jpeg"]'::jsonb,
-    480, 12, NULL, NULL, NULL,
-    NULL, NULL, NULL,
-    true
-  )
-ON CONFLICT (id) DO NOTHING;

@@ -1,7 +1,7 @@
 {
   "common": {
     "search": "Cerca",
-    "searchPlaceholder": "Dove vuoi andare?",
+    "searchPlaceholder": "Che avventura stai cercando?",
     "seeAll": "Vedi tutti",
     "back": "Indietro",
     "share": "Condividi",
@@ -39,7 +39,8 @@
     "reviewsFromGoogle": "Recensioni da Google",
     "seeReviewsOnGoogle": "Vedi tutte le recensioni su Google",
     "ratingCount": "{rating} · {count} recensioni su Google",
-    "ratingShort": "{rating} · {count}"
+    "ratingShort": "{rating} · {count}",
+    "view": "Vedi"
   },
   "interestForm": {
     "title": "Esprimi il tuo interesse",
@@ -127,6 +128,18 @@
     "imageUrls": "URL immagini (uno per riga)",
     "imageUrlsHintUpload": "Aggiungi URL (uno per riga) o carica file sopra.",
     "uploading": "Caricamento…",
+    "settings": "Impostazioni",
+    "heroImage": "Immagine hero homepage",
+    "heroImageHint": "Immagine di sfondo della homepage. Carica una nuova immagine o inserisci un percorso (es. media/site/hero.jpg) o URL completo.",
+    "currentHero": "Hero attuale",
+    "uploadNewHero": "Carica nuova immagine",
+    "heroCropHint": "Dopo la selezione puoi ritagliare, spostare e ridimensionare.",
+    "orPathOrUrl": "Oppure percorso / URL",
+    "saved": "Salvato.",
+    "editImage": "Modifica immagine (ritaglia, sposta, ridimensiona)",
+    "zoom": "Zoom",
+    "cancel": "Annulla",
+    "confirm": "Conferma",
     "delete": "Elimina",
     "deleteConfirm": "Eliminare questa esperienza?"
   },

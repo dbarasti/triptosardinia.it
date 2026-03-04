@@ -4,7 +4,7 @@ import { useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { getImageUrl } from '@/lib/image-utils';
 
-const isVideoUrl = (url: string) => /\.(mp4|webm)(\?|$)/i.test(url);
+const isVideoUrl = (url: string) => /\.(mp4|webm|mov)(\?|$)/i.test(url);
 
 type Props = { imageUrls: string[] };
 

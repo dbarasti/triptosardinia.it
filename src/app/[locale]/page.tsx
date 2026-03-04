@@ -17,6 +17,11 @@ export default async function HomePage({ params }: Props) {
   const tCommon = await getTranslations('common');
   const experiences = await db.getExperiences();
   const ratings = await getReviewsSummaryForExperiences(experiences.map((e) => e.id));
+  const heroPath = await db.getSiteSetting('hero_image_path');
+  const heroUrl =
+    (heroPath && getImageUrl(heroPath)) ||
+    getImageUrl(process.env.NEXT_PUBLIC_HERO_IMAGE_URL) ||
+    'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1920';
 
   return (
     <div className="relative flex flex-col overflow-x-hidden">
@@ -25,7 +30,7 @@ export default async function HomePage({ params }: Props) {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url('${getImageUrl(process.env.NEXT_PUBLIC_HERO_IMAGE_URL) || 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1920'}')`,
+            backgroundImage: `url('${heroUrl}')`,
           }}
           aria-hidden
         />

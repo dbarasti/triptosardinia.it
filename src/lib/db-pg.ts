@@ -1,5 +1,5 @@
 /**
- * PostgreSQL data layer for CoastExperience.
+ * PostgreSQL data layer for Trip to Sardinia.
  * Used when DATABASE_URL is set (local Postgres or Supabase direct connection).
  */
 import { Pool } from 'pg';
@@ -437,6 +437,22 @@ export const dbPg = {
          reviews = EXCLUDED.reviews,
          fetched_at = NOW()`,
       [experienceId, placeId, rating, userRatingsTotal, JSON.stringify(reviews)]
+    );
+  },
+
+  async getSiteSetting(key: string): Promise<string | null> {
+    const pool = getPool();
+    const res = await pool.query('SELECT value FROM site_settings WHERE key = $1', [key]);
+    const row = res.rows[0];
+    return row ? (row.value as string) : null;
+  },
+
+  async setSiteSetting(key: string, value: string): Promise<void> {
+    const pool = getPool();
+    await pool.query(
+      `INSERT INTO site_settings (key, value) VALUES ($1, $2)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [key, value]
     );
   },
 };

@@ -1,7 +1,7 @@
 {
   "common": {
     "search": "Search",
-    "searchPlaceholder": "Where do you want to go?",
+    "searchPlaceholder": "What adventure are you looking for?",
     "seeAll": "See all",
     "back": "Back",
     "share": "Share",
@@ -39,7 +39,8 @@
     "reviewsFromGoogle": "Reviews from Google",
     "seeReviewsOnGoogle": "See all reviews on Google",
     "ratingCount": "{rating} · {count} reviews on Google",
-    "ratingShort": "{rating} · {count}"
+    "ratingShort": "{rating} · {count}",
+    "view": "View"
   },
   "interestForm": {
     "title": "Express your interest",
@@ -127,6 +128,18 @@
     "imageUrls": "Image URLs (one per line)",
     "imageUrlsHintUpload": "Add URLs (one per line) or upload files above.",
     "uploading": "Uploading…",
+    "settings": "Settings",
+    "heroImage": "Homepage hero image",
+    "heroImageHint": "Background image shown on the homepage. Upload a new image or enter a path (e.g. media/site/hero.jpg) or full URL.",
+    "currentHero": "Current hero",
+    "uploadNewHero": "Upload new image",
+    "heroCropHint": "You can crop, move and resize after selecting.",
+    "orPathOrUrl": "Or path / URL",
+    "saved": "Saved.",
+    "editImage": "Edit image (crop, move, resize)",
+    "zoom": "Zoom",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
     "delete": "Delete",
     "deleteConfirm": "Are you sure you want to delete this experience?"
   },

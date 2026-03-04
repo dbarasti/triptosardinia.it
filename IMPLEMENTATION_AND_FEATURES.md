@@ -1,4 +1,4 @@
-# CoastExperience — Implementation & Features (single reference)
+# Trip to Sardinia — Implementation & Features (single reference)
 
 This file documents what has been implemented from `PRODUCT_AND_TECHNICAL_BRIEF.md` and what was intentionally **not** implemented (open points or unclear specs). Use it as the single source of truth for scope and handover.
 
@@ -65,7 +65,7 @@ This file documents what has been implemented from `PRODUCT_AND_TECHNICAL_BRIEF.
 
 - **Home**: `/[locale]` — hero, search, categories, trending experiences.
 - **Experiences list**: `/[locale]/experiences` — optional query `?q=` for search.
-- **Experience detail**: `/[locale]/experiences/[slug]` — full content, OG meta, JSON-LD, interest form or “Contact coming soon”.
+- **Experience detail**: `/[locale]/experiences/[slug]` — full content, OG meta, JSON-LD, **Google reviews** (when URL set), interest form or “Contact coming soon”.
 - **Category / area**: `/[locale]/categories/[categorySlug]`, `/[locale]/areas/[areaSlug]`.
 - **Favorites**: `/[locale]/favorites` — session-stored saved experiences.
 - **Admin**: `/[locale]/admin`, `/admin/login`, `/admin/experiences`, `/admin/leads`, `/admin/analytics`, `/admin/experiences/[id]`, `/admin/experiences/new`.
@@ -81,6 +81,14 @@ This file documents what has been implemented from `PRODUCT_AND_TECHNICAL_BRIEF.
   - **Login page**: `/[locale]/admin/login`; logout via “Sign out” in admin nav.
 - **First admin**: Run schema, then `PASSWORD=yourPassword node --env-file=.env.local scripts/create-admin.mjs` (or `npm run create-admin` with env). **Environment**: `NEXTAUTH_SECRET` required (e.g. `openssl rand -base64 32`).
 
+### 1.10 Google Maps reviews
+
+- **When**: Shown on the experience detail page only if the experience has a **Google Maps / Business URL** (optional field in admin). If no URL is set, the section shows “Reviews (coming soon)”.
+- **Data**: Experiences have optional `google_maps_url` and `google_place_id`. Place ID is resolved from the URL when possible (e.g. `place_id=ChIJ...` in the URL); otherwise only the “See reviews on Google” link is shown.
+- **Backend**: `src/lib/google-reviews.ts` — uses **Google Places API (New) v1** (`GET https://places.googleapis.com/v1/places/{placeId}`) with field mask `rating,userRatingCount,reviews`. Requires **GOOGLE_PLACES_API_KEY**. Enable “Places API (New)” in Google Cloud. Responses are cached for 24 hours (DB table `experience_google_reviews` when using Postgres, or in-memory when not).
+- **UX**: Rating summary (e.g. “4.5 · 12 reviews on Google”), up to 5 review snippets (author, stars, relative time, text), and “Reviews from Google” with link “See all reviews on Google” to the stored URL. If the API key is missing or the request fails, the link is still shown when a URL is set.
+- **Admin**: Create/edit experience form includes “Google Maps / Business URL” (optional). No separate Place ID field; Place ID is extracted from the URL or left empty.
+
 ---
 
 ## 2. Not implemented / open points
@@ -90,7 +98,7 @@ This file documents what has been implemented from `PRODUCT_AND_TECHNICAL_BRIEF.
 - **Full admin CRUD**: Create/edit experience form is only a stub; persistence is in-memory. Full create/edit/delete should be wired to Supabase (or chosen backend) and documented.
 - **Lead notification**: Optional “email to provider or site owner when someone expresses interest” was not implemented; no email sending or webhook.
 - **301 redirect map**: No dynamic redirect from old experience slugs to new ones or to fallback pages; to be added when slug changes/removals are defined (e.g. in next.config or middleware).
-- **On-platform reviews**: Not implemented; experience detail shows a “Reviews (coming soon)” placeholder for future Google-sourced reviews.
+- **On-platform reviews**: Implemented via **Google Maps reviews** when a Google Maps/Business URL is set on the experience; see §1.10. Place ID is extracted from the URL; Google Places API (with key) fetches and caches reviews.
 
 ---
 

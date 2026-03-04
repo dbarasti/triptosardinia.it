@@ -1,14 +1,14 @@
-# CoastExperience — Product & Technical Brief for Agents
+# Trip to Sardinia — Product & Technical Brief for Agents
 
 **Version:** 1.1  
 **Last updated:** February 2026  
-**Purpose:** Single source of truth for AI agents and developers building CoastExperience. Read this before making changes.
+**Purpose:** Single source of truth for AI agents and developers building Trip to Sardinia. Read this before making changes.
 
 ---
 
 ## 1. Product vision
 
-CoastExperience is a **discovery and interest-tracking** product for the **northern coast of Sardinia**. It helps tourists and visitors find experiences and adventures, express interest (party size + dates), and then book **directly with the activity provider** (their website or contact). The platform does **not** process bookings or payments.
+Trip to Sardinia is a **discovery and interest-tracking** product for the **northern coast of Sardinia**. It helps tourists and visitors find experiences and adventures, express interest (party size + dates), and then book **directly with the activity provider** (their website or contact). The platform does **not** process bookings or payments.
 
 **Four main focuses (in order of importance):**
 

@@ -90,6 +90,7 @@ const experiences: Experience[] = [
 
 const interestEvents: InterestEvent[] = [];
 const viewEvents: ExperienceViewEvent[] = [];
+const siteSettings = new Map<string, string>();
 
 const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const googleReviewsCache = new Map<string, { place_id: string; rating: number; user_ratings_total: number; reviews: unknown[]; fetched_at: string }>();
@@ -305,5 +306,13 @@ export const dbMemory = {
       reviews,
       fetched_at: new Date().toISOString(),
     });
+  },
+
+  async getSiteSetting(key: string): Promise<string | null> {
+    return siteSettings.get(key) ?? null;
+  },
+
+  async setSiteSetting(key: string, value: string): Promise<void> {
+    siteSettings.set(key, value);
   },
 };

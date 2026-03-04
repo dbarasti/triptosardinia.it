@@ -12,11 +12,11 @@ import { FavoritesProvider } from '@/lib/favorites';
 import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {
-  title: { default: 'CoastExperience — Experiences Northern Sardinia', template: '%s — CoastExperience' },
+  title: { default: 'Trip to Sardinia — Experiences Northern Sardinia', template: '%s — Trip to Sardinia' },
   description: 'Discover and track your interest in experiences and adventures on the northern coast of Sardinia. Kayaking, diving, hiking and more.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   openGraph: {
-    siteName: 'CoastExperience',
+    siteName: 'Trip to Sardinia',
     locale: 'en',
     alternateLocale: ['it'],
   },

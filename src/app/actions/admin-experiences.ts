@@ -17,13 +17,13 @@ export async function uploadExperienceMedia(
   const prefix = experienceId || '_draft';
   const files = formData.getAll('files') as File[];
   if (!files.length) return { ok: false, error: 'No files' };
-  const allowedTypes = /^image\/(jpeg|png|gif|webp)|video\/(mp4|webm)$/i;
+  const allowedTypes = /^image\/(jpeg|png|gif|webp)|video\/(mp4|webm|quicktime)$/i;
   const paths: string[] = [];
   const supabase = getSupabaseServer();
 
   for (const file of files) {
     if (!file.size || !allowedTypes.test(file.type)) continue;
-    const ext = path.extname(file.name) || (file.type.startsWith('video/') ? '.mp4' : '.jpg');
+    const ext = path.extname(file.name) || (file.type.startsWith('video/') ? (file.type.includes('quicktime') ? '.mov' : '.mp4') : '.jpg');
     const base = path.basename(file.name, path.extname(file.name)).replace(/\s+/g, '-').slice(0, 40);
     const key = `${crypto.randomUUID().slice(0, 8)}-${base}${ext}`;
     const storedPath = `media/experiences/${prefix}/images/${key}`;
@@ -45,6 +45,34 @@ export async function uploadExperienceMedia(
     paths.push(storedPath);
   }
   return paths.length ? { ok: true, paths } : { ok: false, error: 'No valid files' };
+}
+
+/** Replace an existing media file (e.g. after crop). Path is the stored path (e.g. media/experiences/exp-1/images/xyz.jpg). */
+export async function replaceExperienceMedia(
+  existingPath: string,
+  formData: FormData
+): Promise<{ ok: boolean; error?: string }> {
+  const pathTrim = existingPath.trim();
+  if (!pathTrim.startsWith('media/')) return { ok: false, error: 'Invalid path' };
+  const file = formData.get('file') as File | null;
+  if (!file?.size || !file.type.startsWith('image/')) return { ok: false, error: 'No image file' };
+
+  const supabase = getSupabaseServer();
+  const objectKey = pathTrim.slice('media/'.length);
+
+  if (supabase) {
+    const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(objectKey, file, {
+      contentType: file.type,
+      upsert: true,
+    });
+    if (error) return { ok: false, error: error.message };
+  } else {
+    const dest = path.join(process.cwd(), 'public', pathTrim);
+    await fs.mkdir(path.dirname(dest), { recursive: true });
+    const buf = Buffer.from(await file.arrayBuffer());
+    await fs.writeFile(dest, buf);
+  }
+  return { ok: true };
 }
 
 export async function setExperiencePublished(id: string, published: boolean): Promise<{ ok: boolean; error?: string }> {

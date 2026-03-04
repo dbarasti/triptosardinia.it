@@ -19,6 +19,7 @@ export const routing = defineRouting({
     '/admin/analytics': '/admin/analytics',
     '/admin/leads': '/admin/leads',
     '/admin/login': '/admin/login',
+    '/admin/settings': '/admin/settings',
   },
 });
 

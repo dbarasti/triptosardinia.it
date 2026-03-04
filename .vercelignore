@@ -1,0 +1,22 @@
+# Dependencies (Vercel installs from package.json)
+node_modules
+
+# Build output (Vercel runs its own build)
+.next
+
+# Local env (never deploy secrets)
+.env
+.env.*
+!.env.example
+
+# Test and tooling
+coverage
+*.log
+.idea
+.vscode
+
+# Reference assets (not used at runtime)
+stitch_experience_pricing_and_availability
+
+# Vercel CLI
+.vercel
