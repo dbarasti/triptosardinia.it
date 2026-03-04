@@ -3,6 +3,9 @@
  * Usage: node --env-file=.env.local scripts/create-admin.mjs
  * Or: USERNAME=admin PASSWORD=yourpassword node --env-file=.env.local scripts/create-admin.mjs
  *
+ * Production: use a strong password (e.g. generate with: openssl rand -base64 24).
+ * Example: PASSWORD=$(openssl rand -base64 24) npm run create-admin
+ *
  * Requires: DATABASE_URL and NEXTAUTH_SECRET set. Creates/updates admin_users table and inserts one user.
  */
 import pg from 'pg';
@@ -19,7 +22,7 @@ if (!databaseUrl) {
   process.exit(1);
 }
 if (!password || password.length < 8) {
-  console.error('Set PASSWORD or ADMIN_PASSWORD (min 8 characters)');
+  console.error('Set PASSWORD or ADMIN_PASSWORD (min 8 characters; use a strong random password in production)');
   process.exit(1);
 }
 

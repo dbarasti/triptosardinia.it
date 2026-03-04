@@ -10,6 +10,10 @@ import fs from 'fs/promises';
 const MEDIA_BUCKET = 'media';
 const PUBLIC_MEDIA = path.join(process.cwd(), 'public', MEDIA_BUCKET);
 
+function isProduction(): boolean {
+  return process.env.NODE_ENV === 'production';
+}
+
 export async function uploadExperienceMedia(
   experienceId: string | null,
   formData: FormData
@@ -35,6 +39,11 @@ export async function uploadExperienceMedia(
         upsert: true,
       });
       if (error) return { ok: false, error: error.message };
+    } else if (isProduction()) {
+      return {
+        ok: false,
+        error: 'Image upload requires Supabase Storage. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY), and create a "media" bucket in Supabase.',
+      };
     } else {
       const dir = path.join(PUBLIC_MEDIA, 'experiences', prefix, 'images');
       await fs.mkdir(dir, { recursive: true });
@@ -66,6 +75,11 @@ export async function replaceExperienceMedia(
       upsert: true,
     });
     if (error) return { ok: false, error: error.message };
+  } else if (isProduction()) {
+    return {
+      ok: false,
+      error: 'Image upload requires Supabase Storage. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY), and create a "media" bucket in Supabase.',
+    };
   } else {
     const dest = path.join(process.cwd(), 'public', pathTrim);
     await fs.mkdir(path.dirname(dest), { recursive: true });

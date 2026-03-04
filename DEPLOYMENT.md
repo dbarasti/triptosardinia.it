@@ -21,7 +21,7 @@
      - `DATABASE_URL` — Connection string (e.g. Supabase “Connection string” from Project Settings → Database)
    - **If using Supabase Storage for media**
      - `NEXT_PUBLIC_SUPABASE_URL`
-     - `SUPABASE_SERVICE_ROLE_KEY`
+     - `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`)
      - `NEXT_PUBLIC_USE_MEDIA_PROXY=true`
    - **Optional**
      - `GOOGLE_PLACES_API_KEY` — For Google reviews
@@ -43,4 +43,4 @@ In Vercel: Project → Settings → Domains. Add your domain and follow the DNS 
 
 - **Build fails** — Check build logs; ensure all required env vars are set for the “Production” environment.
 - **NextAuth redirect / session issues** — Set `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to the exact production URL (no trailing slash).
-- **Images or media 404** — If using Supabase Storage, set `NEXT_PUBLIC_USE_MEDIA_PROXY=true` and ensure `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set.
+- **Images or media 404** — If using Supabase Storage, set `NEXT_PUBLIC_USE_MEDIA_PROXY=true` and ensure `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`) are set.

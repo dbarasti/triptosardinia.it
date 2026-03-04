@@ -1,13 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// New dashboard: "Secret key". Legacy: "Service role" key. Both work for server-side Storage.
+const supabaseSecretKey =
+  process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 /**
- * Server-only Supabase client (service role). Use in Server Actions and API routes.
+ * Server-only Supabase client (full access). Use in Server Actions and API routes.
  * Only for Storage (and optionally Auth); DB continues to use pg.
  */
 export function getSupabaseServer() {
-  if (!supabaseUrl || !supabaseServiceKey) return null;
-  return createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } });
+  if (!supabaseUrl || !supabaseSecretKey) return null;
+  return createClient(supabaseUrl, supabaseSecretKey, { auth: { persistSession: false } });
 }
