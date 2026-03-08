@@ -76,7 +76,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
       <div className="px-4">
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">{title}</h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-400 text-sm">{description}</p>
+        <p className="mt-2 text-slate-600 dark:text-slate-400 text-sm whitespace-pre-line">{description}</p>
       </div>
 
       {/* Key features */}
