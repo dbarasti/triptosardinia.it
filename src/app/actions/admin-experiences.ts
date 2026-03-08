@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getSupabaseServer } from '@/lib/supabase-server';
+import { cleanupDraftPaths } from '@/lib/media-cleanup';
 import type { Experience } from '@/lib/types';
 import path from 'path';
 import fs from 'fs/promises';
@@ -12,6 +13,56 @@ const PUBLIC_MEDIA = path.join(process.cwd(), 'public', MEDIA_BUCKET);
 
 function isProduction(): boolean {
   return process.env.NODE_ENV === 'production';
+}
+
+/** Moves a file within the media bucket (Supabase) or on the local filesystem. */
+async function moveStoredFile(
+  fromObjectKey: string,
+  toObjectKey: string,
+  supabase: ReturnType<typeof getSupabaseServer>
+): Promise<void> {
+  if (supabase) {
+    const { error } = await supabase.storage.from(MEDIA_BUCKET).move(fromObjectKey, toObjectKey);
+    if (error) throw new Error(error.message);
+  } else {
+    const src = path.join(process.cwd(), 'public', MEDIA_BUCKET, fromObjectKey);
+    const dest = path.join(process.cwd(), 'public', MEDIA_BUCKET, toObjectKey);
+    await fs.mkdir(path.dirname(dest), { recursive: true });
+    await fs.rename(src, dest);
+  }
+}
+
+/**
+ * Moves all _draft image paths for a given experience to its permanent folder,
+ * updates the DB, and returns the updated image_urls.
+ */
+async function moveDraftImages(
+  imageUrls: string[],
+  experienceId: string,
+  supabase: ReturnType<typeof getSupabaseServer>
+): Promise<string[]> {
+  const updated = [...imageUrls];
+  for (let i = 0; i < updated.length; i++) {
+    const url = updated[i];
+    if (!url.startsWith('media/experiences/_draft/')) continue;
+    const filename = url.slice('media/experiences/_draft/images/'.length);
+    const newPath = `media/experiences/${experienceId}/images/${filename}`;
+    await moveStoredFile(
+      `experiences/_draft/images/${filename}`,
+      `experiences/${experienceId}/images/${filename}`,
+      supabase
+    );
+    // Move original too if it exists
+    try {
+      await moveStoredFile(
+        `experiences/_draft/images/originals/${filename}`,
+        `experiences/${experienceId}/images/originals/${filename}`,
+        supabase
+      );
+    } catch { /* original may not exist yet */ }
+    updated[i] = newPath;
+  }
+  return updated;
 }
 
 export async function uploadExperienceMedia(
@@ -191,6 +242,12 @@ export async function createExperienceAction(formData: FormData): Promise<{ ok: 
   if (errors.length > 0) return { ok: false, errors };
   try {
     const exp = await db.createExperience(data);
+    // Move any _draft images to the permanent experience folder
+    if (data.image_urls.some((u) => u.startsWith('media/experiences/_draft/'))) {
+      const supabase = getSupabaseServer();
+      const newImageUrls = await moveDraftImages(data.image_urls, exp.id, supabase);
+      await db.updateExperience(exp.id, { image_urls: newImageUrls });
+    }
     revalidatePath('/admin');
     revalidatePath('/admin/experiences');
     revalidatePath('/en');
@@ -222,10 +279,55 @@ export async function updateExperienceAction(id: string, formData: FormData): Pr
   }
 }
 
+export async function cleanupDraftMediaAction(paths: string[]): Promise<{ ok: boolean }> {
+  try {
+    await cleanupDraftPaths(paths);
+    return { ok: true };
+  } catch {
+    return { ok: false };
+  }
+}
+
+export async function migrateDraftMediaAction(): Promise<{ ok: boolean; migrated: number; error?: string }> {
+  try {
+    const experiences = await db.getAllExperiencesForAdmin();
+    const supabase = getSupabaseServer();
+    let migrated = 0;
+    for (const exp of experiences) {
+      if (!exp.image_urls.some((u) => u.startsWith('media/experiences/_draft/'))) continue;
+      const newImageUrls = await moveDraftImages(exp.image_urls, exp.id, supabase);
+      await db.updateExperience(exp.id, { image_urls: newImageUrls });
+      migrated++;
+    }
+    revalidatePath('/admin/experiences');
+    revalidatePath('/en');
+    revalidatePath('/it');
+    return { ok: true, migrated };
+  } catch (e) {
+    return { ok: false, migrated: 0, error: String(e) };
+  }
+}
+
 export async function deleteExperienceAction(id: string): Promise<{ ok: boolean; error?: string }> {
   try {
     const deleted = await db.deleteExperience(id);
     if (!deleted) return { ok: false, error: 'not_found' };
+
+    // Delete all media files for this experience
+    const supabase = getSupabaseServer();
+    if (supabase) {
+      for (const prefix of [`experiences/${id}/images`, `experiences/${id}/images/originals`]) {
+        const { data: files } = await supabase.storage.from(MEDIA_BUCKET).list(prefix);
+        if (files?.length) {
+          const keys = files.map((f) => `${prefix}/${f.name}`);
+          await supabase.storage.from(MEDIA_BUCKET).remove(keys);
+        }
+      }
+    } else if (!isProduction()) {
+      const folder = path.join(PUBLIC_MEDIA, 'experiences', id);
+      await fs.rm(folder, { recursive: true, force: true });
+    }
+
     revalidatePath('/admin');
     revalidatePath('/admin/experiences');
     revalidatePath('/admin/leads');

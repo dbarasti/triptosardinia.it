@@ -15,6 +15,7 @@ type Props = {
   locale: string;
   /** When provided (edit flow), show file upload. Omit for create flow. */
   experienceId?: string;
+  onDraftPathsChange?: (paths: string[]) => void;
   initial?: {
     title_en: string;
     title_it: string;
@@ -41,7 +42,7 @@ type Props = {
 const inputClass =
   'w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 text-slate-900 dark:text-white';
 
-export function ExperienceFormFields({ areas, categories, locale, experienceId, initial }: Props) {
+export function ExperienceFormFields({ areas, categories, locale, experienceId, onDraftPathsChange, initial }: Props) {
   const t = useTranslations('admin');
   const [imageUrls, setImageUrls] = useState<string[]>(initial?.image_urls ?? []);
   const [uploading, setUploading] = useState(false);
@@ -62,7 +63,12 @@ export function ExperienceFormFields({ areas, categories, locale, experienceId, 
     const result = await uploadExperienceMedia(experienceId ?? null, formData);
     setUploading(false);
     if (result.ok && result.paths?.length) {
-      setImageUrls((prev) => [...prev, ...result.paths!]);
+      setImageUrls((prev) => {
+        const next = [...prev, ...result.paths!];
+        const draftPaths = next.filter((p) => p.startsWith('media/experiences/_draft/'));
+        onDraftPathsChange?.(draftPaths);
+        return next;
+      });
     } else if (result.error) {
       setUploadError(result.error);
     }
