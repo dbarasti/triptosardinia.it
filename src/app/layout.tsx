@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={plusJakarta.variable} suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/logo-triptosardinia.png" type="image/png" />
+        <link rel="icon" href="/logo_new.png" type="image/png" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0"
           rel="stylesheet"

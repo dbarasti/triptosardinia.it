@@ -27,14 +27,13 @@ export function Header() {
       <div className="max-w-4xl mx-auto flex items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg">
           <Image
-            src="/logo-triptosardinia.png"
-            alt=""
-            width={56}
-            height={56}
-            className="h-14 w-14 object-contain flex-shrink-0 mix-blend-multiply dark:mix-blend-screen"
+            src="/logo_new_transparent.png"
+            alt="Trip to Sardinia"
+            width={178}
+            height={65}
+            className="h-14 w-auto object-contain flex-shrink-0"
             priority
           />
-          <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Trip to Sardinia</span>
         </Link>
         <nav className="flex items-center gap-2" aria-label="Language selection">
           <button
