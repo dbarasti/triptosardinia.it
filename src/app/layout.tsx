@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -17,7 +18,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           rel="stylesheet"
         />
       </head>
-      <body className="font-display">{children}</body>
+      <body className="font-display">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
