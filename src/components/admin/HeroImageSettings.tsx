@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { setHeroImage } from '@/app/actions/admin-settings';
 import { replaceExperienceMedia } from '@/app/actions/admin-experiences';
-import { getImageUrl } from '@/lib/image-utils';
+import { getImageUrl, getOriginalPath } from '@/lib/image-utils';
 import { ImageCropModal } from './ImageCropModal';
 
 type Props = { initialHeroPath: string | null };
@@ -96,7 +96,7 @@ export function HeroImageSettings({ initialHeroPath }: Props) {
             {canEditHero && (
               <button
                 type="button"
-                onClick={() => setCropModal({ imageSrc: currentUrl, mode: 'replace', path: initialHeroPath! })}
+                onClick={() => setCropModal({ imageSrc: getImageUrl(getOriginalPath(initialHeroPath!)), mode: 'replace', path: initialHeroPath! })}
                 className="text-xs font-semibold text-primary hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded flex items-center gap-1"
               >
                 <span className="material-symbols-outlined text-sm">crop</span>
@@ -113,6 +113,7 @@ export function HeroImageSettings({ initialHeroPath }: Props) {
       {cropModal && (
         <ImageCropModal
           imageSrc={cropModal.imageSrc}
+          fallbackSrc={cropModal.mode === 'replace' ? currentUrl : undefined}
           onSave={handleCropSave}
           onCancel={() => {
             if (cropModal.mode === 'new' && cropModal.objectUrl) URL.revokeObjectURL(cropModal.objectUrl);

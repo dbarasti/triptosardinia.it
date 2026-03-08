@@ -22,6 +22,7 @@ export async function setHeroImage(formData: FormData): Promise<{ ok: boolean; e
     const ext = path.extname(file.name) || '.jpg';
     const storedPath = `media/site/hero${ext}`;
     const objectKey = `site/hero${ext}`;
+    const originalObjectKey = `site/originals/hero${ext}`;
     const supabase = getSupabaseServer();
 
     if (supabase) {
@@ -30,17 +31,22 @@ export async function setHeroImage(formData: FormData): Promise<{ ok: boolean; e
         upsert: true,
       });
       if (error) return { ok: false, error: error.message };
+      await supabase.storage.from(MEDIA_BUCKET).upload(originalObjectKey, file, {
+        contentType: file.type,
+        upsert: true,
+      });
     } else if (isProduction()) {
       return {
         ok: false,
-        error: 'Image upload requires Supabase Storage. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY), and create a "media" bucket in Supabase.',
+        error: 'Image upload requires Supabase Storage. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY), and create a "media" bucket in Supabase.',
       };
     } else {
       const dir = path.join(PUBLIC_MEDIA, 'site');
       await fs.mkdir(dir, { recursive: true });
-      const dest = path.join(dir, `hero${ext}`);
       const buf = Buffer.from(await file.arrayBuffer());
-      await fs.writeFile(dest, buf);
+      await fs.writeFile(path.join(dir, `hero${ext}`), buf);
+      await fs.mkdir(path.join(dir, 'originals'), { recursive: true });
+      await fs.writeFile(path.join(dir, 'originals', `hero${ext}`), buf);
     }
     await db.setSiteSetting(HERO_SETTING_KEY, storedPath);
   } else if (pathOrUrl) {

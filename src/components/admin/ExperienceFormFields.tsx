@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useState, useRef } from 'react';
 import { uploadExperienceMedia, replaceExperienceMedia } from '@/app/actions/admin-experiences';
-import { getImageUrl } from '@/lib/image-utils';
+import { getImageUrl, getOriginalPath } from '@/lib/image-utils';
 import { ImageCropModal } from './ImageCropModal';
 
 type Area = { id: string; name_en: string; name_it: string };
@@ -215,7 +215,7 @@ export function ExperienceFormFields({ areas, categories, locale, experienceId, 
                     {!isVideo && (
                       <button
                         type="button"
-                        onClick={() => setCropModal({ imageUrl: getImageUrl(url), path: url })}
+                        onClick={() => setCropModal({ imageUrl: getImageUrl(getOriginalPath(url)), path: url })}
                         className="rounded-full p-1.5 bg-white/90 text-slate-800 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                         aria-label={t('editImage')}
                         title={t('editImage')}
@@ -240,6 +240,7 @@ export function ExperienceFormFields({ areas, categories, locale, experienceId, 
         {cropModal && (
           <ImageCropModal
             imageSrc={cropModal.imageUrl}
+            fallbackSrc={getImageUrl(cropModal.path)}
             onSave={(blob) => handleCropSave(blob, imageUrls.indexOf(cropModal.path))}
             onCancel={() => setCropModal(null)}
           />

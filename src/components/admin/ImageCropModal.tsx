@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Cropper, { type Area } from 'react-easy-crop';
 import { getCroppedImg, type PixelCrop } from '@/lib/crop-image';
 import { useTranslations } from 'next-intl';
@@ -9,16 +9,26 @@ const ASPECT = 4 / 3;
 
 type Props = {
   imageSrc: string;
+  fallbackSrc?: string;
   onSave: (blob: Blob) => void | Promise<void>;
   onCancel: () => void;
 };
 
-export function ImageCropModal({ imageSrc, onSave, onCancel }: Props) {
+export function ImageCropModal({ imageSrc, fallbackSrc, onSave, onCancel }: Props) {
   const t = useTranslations('admin');
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<PixelCrop | null>(null);
   const [saving, setSaving] = useState(false);
+  const [activeSrc, setActiveSrc] = useState(imageSrc);
+
+  useEffect(() => {
+    if (!fallbackSrc) return;
+    const img = new window.Image();
+    img.onload = () => setActiveSrc(imageSrc);
+    img.onerror = () => setActiveSrc(fallbackSrc);
+    img.src = imageSrc;
+  }, [imageSrc, fallbackSrc]);
 
   const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels as PixelCrop);
@@ -28,7 +38,7 @@ export function ImageCropModal({ imageSrc, onSave, onCancel }: Props) {
     if (!croppedAreaPixels) return;
     setSaving(true);
     try {
-      const blob = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const blob = await getCroppedImg(activeSrc, croppedAreaPixels);
       await onSave(blob);
       onCancel();
     } catch (e) {
@@ -42,7 +52,7 @@ export function ImageCropModal({ imageSrc, onSave, onCancel }: Props) {
     <div className="fixed inset-0 z-[100] flex flex-col bg-slate-900" aria-modal="true" role="dialog">
       <div className="flex-1 min-h-0 relative overflow-hidden">
         <Cropper
-          image={imageSrc}
+          image={activeSrc}
           crop={crop}
           zoom={zoom}
           aspect={ASPECT}

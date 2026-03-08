@@ -32,6 +32,7 @@ export async function uploadExperienceMedia(
     const key = `${crypto.randomUUID().slice(0, 8)}-${base}${ext}`;
     const storedPath = `media/experiences/${prefix}/images/${key}`;
     const objectKey = `experiences/${prefix}/images/${key}`;
+    const originalObjectKey = `experiences/${prefix}/images/originals/${key}`;
 
     if (supabase) {
       const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(objectKey, file, {
@@ -39,6 +40,10 @@ export async function uploadExperienceMedia(
         upsert: true,
       });
       if (error) return { ok: false, error: error.message };
+      await supabase.storage.from(MEDIA_BUCKET).upload(originalObjectKey, file, {
+        contentType: file.type,
+        upsert: false,
+      });
     } else if (isProduction()) {
       return {
         ok: false,
@@ -47,9 +52,11 @@ export async function uploadExperienceMedia(
     } else {
       const dir = path.join(PUBLIC_MEDIA, 'experiences', prefix, 'images');
       await fs.mkdir(dir, { recursive: true });
-      const dest = path.join(dir, key);
       const buf = Buffer.from(await file.arrayBuffer());
-      await fs.writeFile(dest, buf);
+      await fs.writeFile(path.join(dir, key), buf);
+      const originalsDir = path.join(dir, 'originals');
+      await fs.mkdir(originalsDir, { recursive: true });
+      await fs.writeFile(path.join(originalsDir, key), buf);
     }
     paths.push(storedPath);
   }
@@ -68,8 +75,15 @@ export async function replaceExperienceMedia(
 
   const supabase = getSupabaseServer();
   const objectKey = pathTrim.slice('media/'.length);
+  const dir = objectKey.substring(0, objectKey.lastIndexOf('/'));
+  const base = objectKey.substring(objectKey.lastIndexOf('/') + 1);
+  const originalObjectKey = `${dir}/originals/${base}`;
 
   if (supabase) {
+    // Ensure original exists before overwriting — copy current main file if not yet saved
+    await supabase.storage.from(MEDIA_BUCKET).copy(objectKey, originalObjectKey);
+    // (error intentionally ignored: if original already exists the copy fails, which is correct)
+
     const { error } = await supabase.storage.from(MEDIA_BUCKET).upload(objectKey, file, {
       contentType: file.type,
       upsert: true,
@@ -82,6 +96,14 @@ export async function replaceExperienceMedia(
     };
   } else {
     const dest = path.join(process.cwd(), 'public', pathTrim);
+    const originalDest = path.join(path.dirname(dest), 'originals', path.basename(dest));
+    // Ensure original exists before overwriting
+    try {
+      await fs.access(originalDest);
+    } catch {
+      await fs.mkdir(path.dirname(originalDest), { recursive: true });
+      await fs.copyFile(dest, originalDest);
+    }
     await fs.mkdir(path.dirname(dest), { recursive: true });
     const buf = Buffer.from(await file.arrayBuffer());
     await fs.writeFile(dest, buf);
