@@ -13,7 +13,7 @@ export function HomeSearch({ initialQuery = '' }: { initialQuery?: string }) {
 
   const goSearch = () => {
     router.push({
-      pathname: '/experiences',
+      pathname: '/',
       query: q.trim() ? { q: q.trim() } : undefined,
     });
   };

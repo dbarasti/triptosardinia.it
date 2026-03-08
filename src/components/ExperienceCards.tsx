@@ -18,16 +18,28 @@ export function ExperienceCards({
   experiences,
   locale,
   ratings,
+  layout = 'scroll',
 }: {
   experiences: Experience[];
   locale: Locale;
   ratings?: Record<string, { rating: number; user_ratings_total: number }>;
+  layout?: 'scroll' | 'grid';
 }) {
   const { isFavorite, toggle } = useFavorites();
   const t = useTranslations('experience');
 
+  const containerClass =
+    layout === 'grid'
+      ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'
+      : 'flex gap-4 overflow-x-auto pb-6 no-scrollbar';
+
+  const articleClass =
+    layout === 'grid'
+      ? 'overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800 flex flex-col'
+      : 'min-w-[280px] overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800 flex flex-col';
+
   return (
-    <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar">
+    <div className={containerClass}>
       {experiences.map((exp) => {
         const title = locale === 'it' ? exp.title_it : exp.title_en;
         const location = locale === 'it' ? exp.location_name_it : exp.location_name_en;
@@ -35,7 +47,7 @@ export function ExperienceCards({
         return (
           <article
             key={exp.id}
-            className="min-w-[280px] overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800 flex flex-col"
+            className={articleClass}
           >
             <div className="relative h-44 w-full flex-shrink-0">
               <Link href={{ pathname: '/experiences/[slug]', params: { slug: exp.slug } }} className="block h-full w-full">

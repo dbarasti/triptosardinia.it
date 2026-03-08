@@ -18,6 +18,7 @@ const categories: Category[] = [
   { id: 'cat-kayaking', slug: 'kayaking', name_en: 'Kayaking', name_it: 'Kayak', icon: 'kayaking' },
   { id: 'cat-surfing', slug: 'surfing', name_en: 'Surfing', name_it: 'Surf', icon: 'surfing' },
   { id: 'cat-camping', slug: 'camping', name_en: 'Camping', name_it: 'Campeggio', icon: 'camping' },
+  { id: 'cat-rentals', slug: 'rentals', name_en: 'Rentals', name_it: 'Noleggi', icon: 'car_rental' },
 ];
 
 const experiences: Experience[] = [

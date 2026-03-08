@@ -13,7 +13,6 @@ export default async function sitemap() {
 
   const staticPaths = [
     '',
-    '/experiences',
     '/favorites',
     '/admin',
     '/admin/experiences',
@@ -30,7 +29,7 @@ export default async function sitemap() {
         url: `${baseUrl}${prefix}${path}`,
         lastModified: new Date(),
         changeFrequency: path.startsWith('/admin') ? 'daily' : 'weekly',
-        priority: path === '' ? 1 : path === '/experiences' ? 0.9 : 0.7,
+        priority: path === '' ? 1 : 0.7,
       });
     }
     for (const exp of experiences) {

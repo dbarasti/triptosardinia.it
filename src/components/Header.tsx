@@ -29,9 +29,9 @@ export function Header() {
           <Image
             src="/logo-triptosardinia.png"
             alt=""
-            width={40}
-            height={40}
-            className="h-10 w-10 rounded-full object-contain flex-shrink-0"
+            width={56}
+            height={56}
+            className="h-14 w-14 object-contain flex-shrink-0 mix-blend-multiply dark:mix-blend-screen"
             priority
           />
           <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Trip to Sardinia</span>
