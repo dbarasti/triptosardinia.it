@@ -96,6 +96,8 @@ export async function setExperiencePublished(id: string, published: boolean): Pr
     revalidatePath('/admin');
     revalidatePath('/admin/experiences');
     revalidatePath('/admin/analytics');
+    revalidatePath('/en');
+    revalidatePath('/it');
     return { ok: true };
   } catch (e) {
     return { ok: false, error: String(e) };
@@ -169,6 +171,8 @@ export async function createExperienceAction(formData: FormData): Promise<{ ok: 
     const exp = await db.createExperience(data);
     revalidatePath('/admin');
     revalidatePath('/admin/experiences');
+    revalidatePath('/en');
+    revalidatePath('/it');
     return { ok: true, id: exp.id };
   } catch (e) {
     return { ok: false, errors: [String(e)] };
@@ -184,6 +188,8 @@ export async function updateExperienceAction(id: string, formData: FormData): Pr
     revalidatePath('/admin');
     revalidatePath('/admin/experiences');
     revalidatePath(`/admin/experiences/${id}`);
+    revalidatePath('/en');
+    revalidatePath('/it');
     if (updated.slug) {
       revalidatePath(`/en/experiences/${updated.slug}`);
       revalidatePath(`/it/experiences/${updated.slug}`);
@@ -202,6 +208,8 @@ export async function deleteExperienceAction(id: string): Promise<{ ok: boolean;
     revalidatePath('/admin/experiences');
     revalidatePath('/admin/leads');
     revalidatePath('/admin/analytics');
+    revalidatePath('/en');
+    revalidatePath('/it');
     return { ok: true };
   } catch (e) {
     return { ok: false, error: String(e) };
