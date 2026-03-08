@@ -440,6 +440,23 @@ export const dbPg = {
     );
   },
 
+  async getGoogleReviewsCacheByPlaceId(placeId: string): Promise<{ rating: number; user_ratings_total: number; reviews: unknown[]; fetched_at: string } | null> {
+    const pool = getPool();
+    const res = await pool.query(
+      'SELECT rating, user_ratings_total, reviews, fetched_at FROM experience_google_reviews WHERE place_id = $1 ORDER BY fetched_at DESC LIMIT 1',
+      [placeId]
+    );
+    const row = res.rows[0];
+    if (!row) return null;
+    const reviews = row.reviews as unknown;
+    return {
+      rating: Number(row.rating),
+      user_ratings_total: Number(row.user_ratings_total ?? 0),
+      reviews: Array.isArray(reviews) ? reviews : (reviews ? JSON.parse(String(reviews)) : []),
+      fetched_at: row.fetched_at instanceof Date ? row.fetched_at.toISOString() : String(row.fetched_at),
+    };
+  },
+
   async getSiteSetting(key: string): Promise<string | null> {
     const pool = getPool();
     const res = await pool.query('SELECT value FROM site_settings WHERE key = $1', [key]);

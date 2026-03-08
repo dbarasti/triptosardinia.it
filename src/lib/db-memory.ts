@@ -309,6 +309,16 @@ export const dbMemory = {
     });
   },
 
+  async getGoogleReviewsCacheByPlaceId(placeId: string): Promise<{ rating: number; user_ratings_total: number; reviews: unknown[]; fetched_at: string } | null> {
+    let best: { rating: number; user_ratings_total: number; reviews: unknown[]; fetched_at: string } | null = null;
+    for (const entry of Array.from(googleReviewsCache.values())) {
+      if (entry.place_id === placeId) {
+        if (!best || entry.fetched_at > best.fetched_at) best = entry;
+      }
+    }
+    return best;
+  },
+
   async getSiteSetting(key: string): Promise<string | null> {
     return siteSettings.get(key) ?? null;
   },

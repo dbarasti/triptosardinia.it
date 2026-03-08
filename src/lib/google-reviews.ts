@@ -135,40 +135,49 @@ export async function getReviewsForExperience(experienceId: string): Promise<Goo
     return { rating: null, user_ratings_total: null, reviews: [], google_maps_url: googleMapsUrl };
   }
 
-  const cached = await db.getGoogleReviewsCache(experienceId);
   const now = Date.now();
-  if (cached && now - new Date(cached.fetched_at).getTime() < CACHE_TTL_MS) {
+
+  // 1. Check by experience_id (fastest path — direct PK lookup)
+  const cachedByExp = await db.getGoogleReviewsCache(experienceId);
+  if (cachedByExp && now - new Date(cachedByExp.fetched_at).getTime() < CACHE_TTL_MS) {
     return {
-      rating: cached.rating || null,
-      user_ratings_total: cached.user_ratings_total || null,
-      reviews: cached.reviews as GoogleReview[],
+      rating: cachedByExp.rating || null,
+      user_ratings_total: cachedByExp.user_ratings_total || null,
+      reviews: cachedByExp.reviews as GoogleReview[],
       google_maps_url: googleMapsUrl,
     };
   }
 
+  // 2. Check by place_id — reuses cached data from another experience sharing the same place
+  const cachedByPlace = await db.getGoogleReviewsCacheByPlaceId(placeId);
+  if (cachedByPlace && now - new Date(cachedByPlace.fetched_at).getTime() < CACHE_TTL_MS) {
+    // Backfill this experience's row so next lookup hits path 1
+    await db.setGoogleReviewsCache(experienceId, placeId, cachedByPlace.rating, cachedByPlace.user_ratings_total, cachedByPlace.reviews);
+    return {
+      rating: cachedByPlace.rating || null,
+      user_ratings_total: cachedByPlace.user_ratings_total || null,
+      reviews: cachedByPlace.reviews as GoogleReview[],
+      google_maps_url: googleMapsUrl,
+    };
+  }
+
+  // 3. Fetch from API
   const details = await fetchPlaceDetails(placeId);
   if (details) {
     const reviews = (details.reviews ?? []).slice(0, 5);
-    await db.setGoogleReviewsCache(
-      experienceId,
-      placeId,
-      details.rating ?? null,
-      details.user_ratings_total ?? null,
-      reviews
-    );
-    return {
-      rating: details.rating ?? null,
-      user_ratings_total: details.user_ratings_total ?? null,
-      reviews,
-      google_maps_url: googleMapsUrl,
-    };
+    const rating = details.rating ?? null;
+    const total = details.user_ratings_total ?? null;
+    await db.setGoogleReviewsCache(experienceId, placeId, rating, total, reviews);
+    return { rating, user_ratings_total: total, reviews, google_maps_url: googleMapsUrl };
   }
 
-  if (cached) {
+  // 4. Stale fallback if API failed
+  const stale = cachedByExp ?? cachedByPlace;
+  if (stale) {
     return {
-      rating: cached.rating || null,
-      user_ratings_total: cached.user_ratings_total || null,
-      reviews: cached.reviews as GoogleReview[],
+      rating: stale.rating || null,
+      user_ratings_total: stale.user_ratings_total || null,
+      reviews: stale.reviews as GoogleReview[],
       google_maps_url: googleMapsUrl,
     };
   }
