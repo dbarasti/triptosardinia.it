@@ -29,7 +29,7 @@ export function CreateExperienceForm({
       const r = await createExperienceAction(formData);
       setResult(r);
       if (r.ok && r.id) {
-        router.push({ pathname: '/admin/experiences/[id]', params: { id: r.id } });
+        router.push('/admin/experiences');
       }
     });
   };
