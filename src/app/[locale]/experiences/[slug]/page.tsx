@@ -90,7 +90,9 @@ export default async function ExperienceDetailPage({ params }: Props) {
             <span className="text-xs text-slate-500 dark:text-slate-400">{t('duration')}</span>
             <span className="text-sm font-bold">
               {exp.duration_minutes >= 60
-                ? `${Math.floor(exp.duration_minutes / 60)}h`
+                ? exp.duration_minutes % 60 > 0
+                  ? `${Math.floor(exp.duration_minutes / 60)}h ${exp.duration_minutes % 60}m`
+                  : `${Math.floor(exp.duration_minutes / 60)}h`
                 : `${exp.duration_minutes}m`}
             </span>
           </div>
