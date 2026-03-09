@@ -38,7 +38,7 @@ export function CookieConsent() {
       role="dialog"
       aria-labelledby="cookie-consent-title"
       aria-describedby="cookie-consent-desc"
-      className="fixed bottom-24 left-4 right-4 z-50 max-w-md mx-auto p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl"
+      className="fixed bottom-24 left-4 right-4 z-[70] max-w-md mx-auto p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl"
     >
       <h2 id="cookie-consent-title" className="text-lg font-bold text-slate-900 dark:text-white">
         {t('title')}
