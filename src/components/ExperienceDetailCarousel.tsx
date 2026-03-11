@@ -6,9 +6,9 @@ import { getImageUrl } from '@/lib/image-utils';
 
 const isVideoUrl = (url: string) => /\.(mp4|webm|mov)(\?|$)/i.test(url);
 
-type Props = { imageUrls: string[] };
+type Props = { imageUrls: string[]; experienceName?: string };
 
-export function ExperienceDetailCarousel({ imageUrls }: Props) {
+export function ExperienceDetailCarousel({ imageUrls, experienceName }: Props) {
   return (
     <div data-hero>
     <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 py-4 no-scrollbar">
@@ -28,7 +28,7 @@ export function ExperienceDetailCarousel({ imageUrls }: Props) {
             ) : (
               <Image
                 src={resolvedUrl}
-                alt=""
+                alt={experienceName ? `${experienceName} — photo ${i + 1}` : `Experience photo ${i + 1}`}
                 width={600}
                 height={450}
                 className="w-full aspect-[4/3] object-cover rounded-xl shadow-sm"

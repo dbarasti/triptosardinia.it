@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     alternateLocale: ['it'],
   },
   robots: { index: true, follow: true },
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 type Props = { children: React.ReactNode; params: Promise<{ locale: string }> };

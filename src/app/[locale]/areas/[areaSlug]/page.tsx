@@ -1,10 +1,47 @@
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
+import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 import { getReviewsSummaryForExperiences } from '@/lib/google-reviews';
 import { ExperienceCards } from '@/components/ExperienceCards';
 
 type Props = { params: Promise<{ locale: string; areaSlug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, areaSlug } = await params;
+  const area = await db.getAreaBySlug(areaSlug);
+  if (!area) return {};
+  const name = locale === 'it' ? area.name_it : area.name_en;
+  const areaDescription = locale === 'it' ? area.description_it : area.description_en;
+  const title = locale === 'it'
+    ? `Esperienze a ${name} — Trip to Sardinia`
+    : `Experiences in ${name} — Trip to Sardinia`;
+  const description = areaDescription
+    ? areaDescription.slice(0, 160)
+    : locale === 'it'
+      ? `Esplora le migliori attività outdoor e avventure a ${name}, sulla costa nord della Sardegna.`
+      : `Explore the best outdoor activities and adventures in ${name}, on the northern coast of Sardinia.`;
+  const path = `/${locale}/areas/${areaSlug}`;
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${path}`,
+      locale: locale === 'it' ? 'it_IT' : 'en_US',
+      type: 'website',
+    },
+    alternates: {
+      canonical: path,
+      languages: {
+        en: `/en/areas/${areaSlug}`,
+        it: `/it/areas/${areaSlug}`,
+      },
+    },
+    twitter: { card: 'summary_large_image', title, description },
+  };
+}
 
 export default async function AreaPage({ params }: Props) {
   const { locale, areaSlug } = await params;

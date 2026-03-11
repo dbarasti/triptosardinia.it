@@ -36,6 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       canonical: path,
       languages: { en: `/en/experiences/${slug}`, it: `/it/experiences/${slug}` },
     },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: description.slice(0, 160),
+      images: ogImageUrl ? [ogImageUrl] : undefined,
+    },
   };
 }
 
@@ -72,7 +78,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {/* Carousel (images and videos; videos autoplay when in view) */}
-      <ExperienceDetailCarousel imageUrls={exp.image_urls} />
+      <ExperienceDetailCarousel imageUrls={exp.image_urls} experienceName={title} />
 
       <div className="px-4">
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">{title}</h1>

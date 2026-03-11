@@ -1,7 +1,12 @@
+import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from '@/lib/db';
 import { getReviewsSummaryForExperiences } from '@/lib/google-reviews';
 import { FavoritesListClient } from '@/components/FavoritesListClient';
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ locale: string }> };
 
