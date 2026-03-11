@@ -19,13 +19,13 @@ export function CategoryExperienceFilter({ experiences, locale, ratings }: Props
     const q = query.trim().toLowerCase();
     if (!q) return experiences;
     return experiences.filter((exp) => {
-      const title = locale === 'it' ? exp.title_it : exp.title_en;
-      const description = locale === 'it' ? exp.description_it : exp.description_en;
-      const location = locale === 'it' ? exp.location_name_it : exp.location_name_en;
       return (
-        title.toLowerCase().includes(q) ||
-        description.toLowerCase().includes(q) ||
-        (location ?? '').toLowerCase().includes(q)
+        exp.title_it.toLowerCase().includes(q) ||
+        exp.title_en.toLowerCase().includes(q) ||
+        exp.description_it.toLowerCase().includes(q) ||
+        exp.description_en.toLowerCase().includes(q) ||
+        (exp.location_name_it ?? '').toLowerCase().includes(q) ||
+        (exp.location_name_en ?? '').toLowerCase().includes(q)
       );
     });
   }, [query, experiences, locale]);
@@ -44,7 +44,7 @@ export function CategoryExperienceFilter({ experiences, locale, ratings }: Props
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('searchPlaceholder')}
           aria-label={t('search')}
-          className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none border-none focus:ring-0"
+          className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none border-none ring-0 focus:ring-0 focus:outline-none"
         />
         {query && (
           <button
