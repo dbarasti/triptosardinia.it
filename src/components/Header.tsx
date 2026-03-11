@@ -22,18 +22,13 @@ export function Header() {
     return { pathname, params: routeParams } as { pathname: '/'; params?: Record<string, string> };
   }, [pathname, params]);
 
-  const isHeroPage = pathname === '/' || pathname === '/experiences/[slug]';
+  const isHeroPage = pathname === '/';
 
   const [scrolledPast, setScrolledPast] = useState(false);
 
   useEffect(() => {
     if (!isHeroPage) return;
-    const onScroll = () => {
-      // Find the hero/carousel element to get its actual height
-      const hero = document.querySelector<HTMLElement>('[data-hero]');
-      const threshold = hero ? hero.offsetHeight - 80 : 260;
-      setScrolledPast(window.scrollY > threshold);
-    };
+    const onScroll = () => setScrolledPast(window.scrollY > 0);
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
