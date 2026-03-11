@@ -19,7 +19,9 @@
     "popularCategories": "Popular Categories",
     "trendingExperiences": "Trending Experiences",
     "ctaTitle": "Join the Community",
-    "ctaSubtitle": "Save your favorite spots and get early access to exclusive experiences."
+    "ctaSubtitle": "Save your favorite spots and get early access to exclusive experiences.",
+    "browseByArea": "Browse by Area",
+    "whatPeopleSay": "What people say"
   },
   "experience": {
     "details": "Experience Details",
@@ -27,6 +29,10 @@
     "duration": "Duration",
     "groupSize": "Group Size",
     "difficulty": "Difficulty",
+    "difficultyEasy": "Easy",
+    "difficultyMedium": "Medium",
+    "difficultyHard": "Hard",
+    "basePrice": "From",
     "location": "Location",
     "viewMap": "View Map",
     "reviews": "Reviews",

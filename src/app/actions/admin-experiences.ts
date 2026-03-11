@@ -201,6 +201,8 @@ function parseFormData(form: FormData): { data: ExperienceFormData; errors: stri
   const google_maps_url = (form.get('google_maps_url') as string)?.trim() || null;
   const google_place_id = (form.get('google_place_id') as string)?.trim() || null;
   const published = form.get('published') === 'on' || form.get('published') === 'true';
+  const priceRaw = (form.get('price_euros') as string)?.trim();
+  const price_cents = priceRaw ? Math.round(parseFloat(priceRaw) * 100) : null;
 
   if (!title_en) errors.push('Title (English) is required');
   if (!title_it) errors.push('Title (Italian) is required');
@@ -233,6 +235,7 @@ function parseFormData(form: FormData): { data: ExperienceFormData; errors: stri
     google_maps_url,
     google_place_id,
     published,
+    price_cents: price_cents != null && !isNaN(price_cents) && price_cents >= 0 ? price_cents : null,
   };
   return { data, errors };
 }

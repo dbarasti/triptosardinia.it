@@ -19,7 +19,9 @@
     "popularCategories": "Categorie popolari",
     "trendingExperiences": "Esperienze in tendenza",
     "ctaTitle": "Unisciti alla community",
-    "ctaSubtitle": "Salva i tuoi posti preferiti e accedi in anteprima a esperienze esclusive."
+    "ctaSubtitle": "Salva i tuoi posti preferiti e accedi in anteprima a esperienze esclusive.",
+    "browseByArea": "Esplora per Area",
+    "whatPeopleSay": "Cosa dicono gli utenti"
   },
   "experience": {
     "details": "Dettagli esperienza",
@@ -27,6 +29,10 @@
     "duration": "Durata",
     "groupSize": "Numero partecipanti",
     "difficulty": "Difficoltà",
+    "difficultyEasy": "Facile",
+    "difficultyMedium": "Medio",
+    "difficultyHard": "Difficile",
+    "basePrice": "A partire da",
     "location": "Posizione",
     "viewMap": "Vedi mappa",
     "reviews": "Recensioni",

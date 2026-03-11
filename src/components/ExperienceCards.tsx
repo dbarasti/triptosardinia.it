@@ -8,6 +8,12 @@ import type { Locale } from '@/lib/types';
 import { useFavorites } from '@/lib/favorites';
 import { getImageUrl } from '@/lib/image-utils';
 
+function formatPrice(cents: number | null | undefined): string | null {
+  if (cents == null) return null;
+  const euros = cents / 100;
+  return euros % 1 === 0 ? `€${euros}` : `€${euros.toFixed(2)}`;
+}
+
 function formatDuration(minutes: number, locale: string): string {
   if (minutes >= 24 * 60) return `${Math.round(minutes / (24 * 60))} days`;
   if (minutes >= 60) {
@@ -106,6 +112,11 @@ export function ExperienceCards({
                   {t('view')}
                   <span className="material-symbols-outlined text-sm">arrow_forward_ios</span>
                 </Link>
+                {formatPrice(exp.price_cents) && (
+                  <span className="text-sm font-bold text-slate-900 dark:text-white">
+                    {formatPrice(exp.price_cents)}
+                  </span>
+                )}
               </div>
             </div>
           </article>

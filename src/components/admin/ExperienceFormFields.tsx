@@ -36,6 +36,7 @@ type Props = {
     published: boolean;
     google_maps_url?: string;
     google_place_id?: string;
+    price_cents?: number | null;
   };
 };
 
@@ -292,6 +293,25 @@ export function ExperienceFormFields({ areas, categories, locale, experienceId, 
             required
             defaultValue={initial?.group_size_max ?? 10}
             className={inputClass}
+          />
+        </div>
+      </div>
+      <div>
+        <label htmlFor="price_euros" className="block text-slate-900 dark:text-white font-semibold mb-2">
+          Base price (€) <span className="text-slate-400 font-normal text-sm">— optional</span>
+        </label>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">€</span>
+          <input
+            id="price_euros"
+            name="price_euros"
+            type="number"
+            min={0}
+            step={0.01}
+            placeholder="0.00"
+            defaultValue={initial?.price_cents != null ? (initial.price_cents / 100).toFixed(2) : ''}
+            className={inputClass + ' pl-8'}
+            onWheel={(e) => e.currentTarget.blur()}
           />
         </div>
       </div>

@@ -82,7 +82,13 @@ export default async function ExperienceDetailPage({ params }: Props) {
 
       <div className="px-4">
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">{title}</h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-400 text-sm whitespace-pre-line">{description}</p>
+        {exp.difficulty && (
+          <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-xs font-semibold text-slate-600 dark:text-slate-300">
+            <span className="material-symbols-outlined text-sm">trending_up</span>
+            {t('difficulty')}: {exp.difficulty === 'easy' ? t('difficultyEasy') : exp.difficulty === 'medium' ? t('difficultyMedium') : exp.difficulty === 'hard' ? t('difficultyHard') : exp.difficulty}
+          </span>
+        )}
+        <p className="mt-3 text-slate-600 dark:text-slate-400 text-sm whitespace-pre-line">{description}</p>
       </div>
 
       {/* Key features */}
@@ -107,13 +113,17 @@ export default async function ExperienceDetailPage({ params }: Props) {
             <span className="text-xs text-slate-500 dark:text-slate-400">{t('groupSize')}</span>
             <span className="text-sm font-bold">{t('upTo', { max: exp.group_size_max })}</span>
           </div>
-          {exp.difficulty && (
-            <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center">
-              <span className="material-symbols-outlined text-primary mb-2">trending_up</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">{t('difficulty')}</span>
-              <span className="text-sm font-bold capitalize">{exp.difficulty}</span>
-            </div>
-          )}
+          <div className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center">
+            <span className="material-symbols-outlined text-primary mb-2">euro</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">{t('basePrice')}</span>
+            <span className="text-sm font-bold">
+              {exp.price_cents != null
+                ? exp.price_cents % 100 === 0
+                  ? `€${exp.price_cents / 100}`
+                  : `€${(exp.price_cents / 100).toFixed(2)}`
+                : '—'}
+            </span>
+          </div>
         </div>
       </section>
 

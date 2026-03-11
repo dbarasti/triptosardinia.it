@@ -79,6 +79,7 @@ function rowToExperience(row: Record<string, unknown>): Experience {
     provider_phone: row.provider_phone as string | null | undefined,
     google_maps_url: row.google_maps_url as string | null | undefined,
     google_place_id: row.google_place_id as string | null | undefined,
+    price_cents: row.price_cents != null ? Number(row.price_cents) : null,
     created_at: row.created_at instanceof Date ? row.created_at.toISOString() : String(row.created_at),
     updated_at: row.updated_at instanceof Date ? row.updated_at.toISOString() : String(row.updated_at),
     published: Boolean(row.published),
@@ -287,7 +288,7 @@ export const dbPg = {
       'slug', 'area_id', 'category_id', 'title_en', 'title_it', 'description_en', 'description_it',
       'image_urls', 'duration_minutes', 'group_size_max', 'difficulty',
       'location_name_en', 'location_name_it', 'location_lat', 'location_lng',
-      'provider_booking_url', 'provider_email', 'provider_phone', 'google_maps_url', 'google_place_id', 'published',
+      'provider_booking_url', 'provider_email', 'provider_phone', 'google_maps_url', 'google_place_id', 'published', 'price_cents',
     ] as const;
     for (const key of allowed) {
       const v = data[key];
@@ -321,8 +322,8 @@ export const dbPg = {
         id, slug, area_id, category_id, title_en, title_it, description_en, description_it,
         image_urls, duration_minutes, group_size_max, difficulty,
         location_name_en, location_name_it, location_lat, location_lng,
-        provider_booking_url, provider_email, provider_phone, google_maps_url, google_place_id, published
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`,
+        provider_booking_url, provider_email, provider_phone, google_maps_url, google_place_id, published, price_cents
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)`,
       [
         id,
         data.slug,
@@ -346,6 +347,7 @@ export const dbPg = {
         data.google_maps_url ?? null,
         data.google_place_id ?? null,
         data.published,
+        data.price_cents ?? null,
       ]
     );
     const exp = await this.getExperienceById(id);
@@ -460,10 +462,10 @@ export const dbPg = {
   async getTopReviewsFromCache(limit: number): Promise<Array<{ experience_id: string; rating: number; reviews: unknown[] }>> {
     const pool = getPool();
     const res = await pool.query(
-      `SELECT experience_id, reviews, rating
+      `SELECT DISTINCT ON (place_id) experience_id, reviews, rating
        FROM experience_google_reviews
        WHERE rating >= 4 AND reviews IS NOT NULL
-       ORDER BY rating DESC, user_ratings_total DESC
+       ORDER BY place_id, rating DESC, user_ratings_total DESC
        LIMIT $1`,
       [limit]
     );

@@ -41,6 +41,8 @@ export interface Experience {
   provider_booking_url?: string | null;
   provider_email?: string | null;
   provider_phone?: string | null;
+  /** Base price in euro cents (e.g. 2500 = €25.00). Nullable if no price set. */
+  price_cents?: number | null;
   /** Google Maps or Business profile URL for reviews. Optional. */
   google_maps_url?: string | null;
   /** Resolved Google Place ID (optional; can be set after first fetch to avoid re-resolving URL). */
