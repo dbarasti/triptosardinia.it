@@ -39,3 +39,5 @@ next-env.d.ts
 coverage
 
 public/media
+
+tsconfig.tsbuildinfo

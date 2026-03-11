@@ -2,6 +2,9 @@
  * Google Place reviews for experiences.
  * Uses Google Places API (New) v1: GET places/{placeId} with fields rating, userRatingCount, reviews.
  * Requires GOOGLE_PLACES_API_KEY. Cache TTL 24h (see db layer).
+ *
+ * Reviews are fetched in both 'it' and 'en' and stored together in the cache, each tagged with
+ * a `language` field. Callers pass their locale to receive only the matching reviews.
  */
 import { db } from './db';
 
@@ -13,6 +16,7 @@ export interface GoogleReview {
   relative_time_description?: string;
   time?: number;
   text?: string;
+  language?: 'it' | 'en';
 }
 
 export interface GoogleReviewsResult {
@@ -54,7 +58,10 @@ interface PlaceDetailsV1 {
   }>;
 }
 
-function mapReviewV1ToOurs(r: NonNullable<PlaceDetailsV1['reviews']>[number]): GoogleReview {
+function mapReviewV1ToOurs(
+  r: NonNullable<PlaceDetailsV1['reviews']>[number],
+  language: 'it' | 'en'
+): GoogleReview {
   const authorName = r.authorAttribution?.displayName ?? 'Anonymous';
   const text = r.text && typeof r.text === 'object' && 'text' in r.text ? (r.text as { text?: string }).text : undefined;
   return {
@@ -62,29 +69,20 @@ function mapReviewV1ToOurs(r: NonNullable<PlaceDetailsV1['reviews']>[number]): G
     rating: typeof r.rating === 'number' ? r.rating : 0,
     relative_time_description: r.relativePublishTimeDescription,
     text,
+    language,
   };
 }
 
-/**
- * Fetch place details from Google Places API (New) v1.
- * Endpoint: GET https://places.googleapis.com/v1/places/{placeId}
- * Headers: X-Goog-Api-Key, X-Goog-FieldMask: rating,userRatingCount,reviews
- * Times out after 8s and returns null on network errors so the page still loads.
- */
 const PLACES_FETCH_TIMEOUT_MS = 8000;
 
-async function fetchPlaceDetails(placeId: string): Promise<{
-  rating?: number;
-  user_ratings_total?: number;
-  reviews?: GoogleReview[];
-} | null> {
-  const key = process.env.GOOGLE_PLACES_API_KEY;
-  if (!key) return null;
-
-  const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`;
+async function fetchPlaceDetailsForLang(
+  placeId: string,
+  language: 'it' | 'en',
+  key: string
+): Promise<{ rating?: number; user_ratings_total?: number; reviews: GoogleReview[] } | null> {
+  const url = `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}?languageCode=${language}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), PLACES_FETCH_TIMEOUT_MS);
-
   try {
     const res = await fetch(url, {
       method: 'GET',
@@ -99,16 +97,10 @@ async function fetchPlaceDetails(placeId: string): Promise<{
     clearTimeout(timeoutId);
     if (!res.ok) return null;
     const data = (await res.json()) as PlaceDetailsV1;
-
     const reviews = Array.isArray(data.reviews)
-      ? data.reviews.slice(0, 5).map(mapReviewV1ToOurs)
+      ? data.reviews.slice(0, 5).map((r) => mapReviewV1ToOurs(r, language))
       : [];
-
-    return {
-      rating: data.rating,
-      user_ratings_total: data.userRatingCount,
-      reviews,
-    };
+    return { rating: data.rating, user_ratings_total: data.userRatingCount, reviews };
   } catch {
     clearTimeout(timeoutId);
     return null;
@@ -116,10 +108,53 @@ async function fetchPlaceDetails(placeId: string): Promise<{
 }
 
 /**
- * Get reviews for an experience. Returns null if the experience has no Google URL/Place ID,
+ * Fetch place details in both 'it' and 'en' in parallel.
+ * Returns merged reviews tagged with their language, plus the locale-independent rating.
+ */
+async function fetchPlaceDetails(placeId: string): Promise<{
+  rating?: number;
+  user_ratings_total?: number;
+  reviews?: GoogleReview[];
+} | null> {
+  const key = process.env.GOOGLE_PLACES_API_KEY;
+  if (!key) return null;
+
+  const [itData, enData] = await Promise.all([
+    fetchPlaceDetailsForLang(placeId, 'it', key),
+    fetchPlaceDetailsForLang(placeId, 'en', key),
+  ]);
+
+  if (!itData && !enData) return null;
+
+  const reviews = [
+    ...(itData?.reviews ?? []),
+    ...(enData?.reviews ?? []),
+  ];
+
+  return {
+    rating: itData?.rating ?? enData?.rating,
+    user_ratings_total: itData?.user_ratings_total ?? enData?.user_ratings_total,
+    reviews,
+  };
+}
+
+/** Filter cached reviews to only those matching the given locale, falling back to all if none match. */
+function filterReviewsByLocale(reviews: GoogleReview[], locale?: string): GoogleReview[] {
+  if (!locale) return reviews;
+  const matched = reviews.filter((r) => !r.language || r.language === locale);
+  // Fall back to all reviews if there are no tagged matches (e.g. old cache entries without language field)
+  return matched.length > 0 ? matched : reviews;
+}
+
+/**
+ * Get reviews for an experience, filtered to the given locale.
+ * Returns null if the experience has no Google URL/Place ID,
  * or if the API key is missing / request fails. Uses cache when valid.
  */
-export async function getReviewsForExperience(experienceId: string): Promise<GoogleReviewsResult | null> {
+export async function getReviewsForExperience(
+  experienceId: string,
+  locale?: string
+): Promise<GoogleReviewsResult | null> {
   const exp = await db.getExperienceById(experienceId);
   if (!exp) return null;
 
@@ -143,7 +178,7 @@ export async function getReviewsForExperience(experienceId: string): Promise<Goo
     return {
       rating: cachedByExp.rating || null,
       user_ratings_total: cachedByExp.user_ratings_total || null,
-      reviews: cachedByExp.reviews as GoogleReview[],
+      reviews: filterReviewsByLocale(cachedByExp.reviews as GoogleReview[], locale),
       google_maps_url: googleMapsUrl,
     };
   }
@@ -151,24 +186,23 @@ export async function getReviewsForExperience(experienceId: string): Promise<Goo
   // 2. Check by place_id — reuses cached data from another experience sharing the same place
   const cachedByPlace = await db.getGoogleReviewsCacheByPlaceId(placeId);
   if (cachedByPlace && now - new Date(cachedByPlace.fetched_at).getTime() < CACHE_TTL_MS) {
-    // Backfill this experience's row so next lookup hits path 1
     await db.setGoogleReviewsCache(experienceId, placeId, cachedByPlace.rating, cachedByPlace.user_ratings_total, cachedByPlace.reviews);
     return {
       rating: cachedByPlace.rating || null,
       user_ratings_total: cachedByPlace.user_ratings_total || null,
-      reviews: cachedByPlace.reviews as GoogleReview[],
+      reviews: filterReviewsByLocale(cachedByPlace.reviews as GoogleReview[], locale),
       google_maps_url: googleMapsUrl,
     };
   }
 
-  // 3. Fetch from API
+  // 3. Fetch from API (both languages)
   const details = await fetchPlaceDetails(placeId);
   if (details) {
-    const reviews = (details.reviews ?? []).slice(0, 5);
+    const reviews = details.reviews ?? [];
     const rating = details.rating ?? null;
     const total = details.user_ratings_total ?? null;
     await db.setGoogleReviewsCache(experienceId, placeId, rating, total, reviews);
-    return { rating, user_ratings_total: total, reviews, google_maps_url: googleMapsUrl };
+    return { rating, user_ratings_total: total, reviews: filterReviewsByLocale(reviews, locale), google_maps_url: googleMapsUrl };
   }
 
   // 4. Stale fallback if API failed
@@ -177,12 +211,41 @@ export async function getReviewsForExperience(experienceId: string): Promise<Goo
     return {
       rating: stale.rating || null,
       user_ratings_total: stale.user_ratings_total || null,
-      reviews: stale.reviews as GoogleReview[],
+      reviews: filterReviewsByLocale(stale.reviews as GoogleReview[], locale),
       google_maps_url: googleMapsUrl,
     };
   }
 
   return { rating: null, user_ratings_total: null, reviews: [], google_maps_url: googleMapsUrl };
+}
+
+/**
+ * Get top-rated reviews from cache for homepage display, filtered to the given locale.
+ */
+export async function getHomepageReviews(
+  locale?: string,
+  limit = 6
+): Promise<Array<{ author_name: string; rating: number; text: string; relative_time_description?: string }>> {
+  try {
+    const rows = await db.getTopReviewsFromCache(20);
+    const allReviews: Array<{ author_name: string; rating: number; text: string; relative_time_description?: string }> = [];
+    for (const row of rows) {
+      const reviews = filterReviewsByLocale(row.reviews as GoogleReview[], locale);
+      for (const r of reviews) {
+        if (r.text && r.text.trim()) {
+          allReviews.push({
+            author_name: r.author_name,
+            rating: r.rating,
+            text: r.text.trim(),
+            relative_time_description: r.relative_time_description,
+          });
+        }
+      }
+    }
+    return allReviews.sort((a, b) => b.rating - a.rating).slice(0, limit);
+  } catch {
+    return [];
+  }
 }
 
 /** Cache TTL for filtering batch results (same as getReviewsForExperience). */

@@ -51,7 +51,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
   const description = locale === 'it' ? exp.description_it : exp.description_en;
   const locationName = locale === 'it' ? exp.location_name_it : exp.location_name_en;
 
-  const reviewsData = await getReviewsForExperience(exp.id);
+  const reviewsData = await getReviewsForExperience(exp.id, locale);
 
   const hasProviderContact =
     !!exp.provider_booking_url || !!exp.provider_email || !!exp.provider_phone;

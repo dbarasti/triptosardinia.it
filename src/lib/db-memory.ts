@@ -319,6 +319,18 @@ export const dbMemory = {
     return best;
   },
 
+  async getTopReviewsFromCache(limit: number): Promise<Array<{ experience_id: string; rating: number; reviews: unknown[] }>> {
+    const results: Array<{ experience_id: string; rating: number; reviews: unknown[] }> = [];
+    for (const [id, entry] of Array.from(googleReviewsCache.entries())) {
+      if (entry.rating >= 4 && Array.isArray(entry.reviews) && entry.reviews.length > 0) {
+        results.push({ experience_id: id, rating: entry.rating, reviews: entry.reviews });
+      }
+    }
+    return results
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, limit);
+  },
+
   async getSiteSetting(key: string): Promise<string | null> {
     return siteSettings.get(key) ?? null;
   },

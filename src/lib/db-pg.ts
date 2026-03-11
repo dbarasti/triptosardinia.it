@@ -457,6 +457,23 @@ export const dbPg = {
     };
   },
 
+  async getTopReviewsFromCache(limit: number): Promise<Array<{ experience_id: string; rating: number; reviews: unknown[] }>> {
+    const pool = getPool();
+    const res = await pool.query(
+      `SELECT experience_id, reviews, rating
+       FROM experience_google_reviews
+       WHERE rating >= 4 AND reviews IS NOT NULL
+       ORDER BY rating DESC, user_ratings_total DESC
+       LIMIT $1`,
+      [limit]
+    );
+    return res.rows.map((row) => ({
+      experience_id: row.experience_id as string,
+      rating: Number(row.rating),
+      reviews: Array.isArray(row.reviews) ? row.reviews : (row.reviews ? JSON.parse(String(row.reviews)) : []),
+    }));
+  },
+
   async getSiteSetting(key: string): Promise<string | null> {
     const pool = getPool();
     const res = await pool.query('SELECT value FROM site_settings WHERE key = $1', [key]);
