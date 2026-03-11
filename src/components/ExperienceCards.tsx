@@ -35,12 +35,12 @@ export function ExperienceCards({
   const containerClass =
     layout === 'grid'
       ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'
-      : 'flex gap-4 overflow-x-auto pb-6 no-scrollbar';
+      : 'flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory px-4 -mx-4';
 
   const articleClass =
     layout === 'grid'
       ? 'overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800 flex flex-col'
-      : 'min-w-[280px] overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800 flex flex-col';
+      : 'flex-none w-[72vw] max-w-[280px] snap-start overflow-hidden rounded-xl bg-white shadow-md dark:bg-slate-800 flex flex-col';
 
   return (
     <div className={containerClass}>

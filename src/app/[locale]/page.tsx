@@ -24,8 +24,8 @@ export default async function HomePage({ params, searchParams }: Props) {
 
   return (
     <div className="relative flex flex-col overflow-x-hidden">
-      {/* Hero */}
-      <div className="relative h-[360px] md:h-[440px] w-full overflow-hidden">
+      {/* Hero — extends behind the fixed transparent header */}
+      <div data-hero className="relative h-[360px] md:h-[440px] w-full overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -33,7 +33,7 @@ export default async function HomePage({ params, searchParams }: Props) {
           }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[var(--background-light)] dark:to-[var(--background-dark)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
         <div className="relative z-10 mt-24 md:mt-32 px-4 md:px-6">
           <h1 className="text-3xl md:text-4xl font-extrabold leading-tight text-white drop-shadow-md">
             {t('title')}
@@ -62,7 +62,7 @@ export default async function HomePage({ params, searchParams }: Props) {
             {locale === 'it' ? 'Nessuna esperienza trovata.' : 'No experiences found.'}
           </p>
         ) : (
-          <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} ratings={ratings} layout="grid" />
+          <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} ratings={ratings} layout="scroll" />
         )}
       </section>
     </div>

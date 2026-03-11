@@ -26,7 +26,7 @@ export function HomeSearch({ initialQuery = '' }: { initialQuery?: string }) {
         </span>
         <input
           type="search"
-          className="w-full border-none bg-transparent p-0 text-sm font-medium focus:ring-0 text-slate-900 dark:text-white placeholder:text-slate-400"
+          className="w-full border-none bg-transparent p-0 text-sm font-medium outline-none focus:ring-0 focus-visible:outline-none text-slate-900 dark:text-white placeholder:text-slate-400"
           placeholder={t('searchPlaceholder')}
           value={q}
           onChange={(e) => setQ(e.target.value)}

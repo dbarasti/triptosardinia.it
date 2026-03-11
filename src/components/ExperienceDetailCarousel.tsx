@@ -10,6 +10,7 @@ type Props = { imageUrls: string[] };
 
 export function ExperienceDetailCarousel({ imageUrls }: Props) {
   return (
+    <div data-hero>
     <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-4 py-4 no-scrollbar">
       {imageUrls.map((url, i) => {
         const resolvedUrl = getImageUrl(url);
@@ -39,6 +40,7 @@ export function ExperienceDetailCarousel({ imageUrls }: Props) {
           </div>
         );
       })}
+    </div>
     </div>
   );
 }

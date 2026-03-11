@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { db } from '@/lib/db';
 import { getReviewsSummaryForExperiences } from '@/lib/google-reviews';
-import { ExperienceCards } from '@/components/ExperienceCards';
+import { CategoryExperienceFilter } from '@/components/CategoryExperienceFilter';
 
 type Props = { params: Promise<{ locale: string; categorySlug: string }> };
 
@@ -18,13 +18,13 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">{name}</h1>
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">{name}</h1>
       {experiences.length === 0 ? (
         <p className="text-slate-600 dark:text-slate-400">
           {locale === 'it' ? 'Nessuna esperienza in questa categoria.' : 'No experiences in this category.'}
         </p>
       ) : (
-        <ExperienceCards experiences={experiences} locale={locale as 'en' | 'it'} ratings={ratings} />
+        <CategoryExperienceFilter experiences={experiences} locale={locale as 'en' | 'it'} ratings={ratings} />
       )}
     </div>
   );
